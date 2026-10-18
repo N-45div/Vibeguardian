@@ -30,3 +30,10 @@ test("mask never reveals the usable middle of the key", () => {
   assert.strictEqual(masked, "AIza…EEEE");
   assert.ok(!masked.includes(KEY.slice(4, -4)));
 });
+
+test("finds authorization keys too, and not FAQ. text", () => {
+  const authKey = "AQ." + "Ab8RN6" + "c".repeat(43) + "g";
+  assert.strictEqual(findGoogleKey(`GEMINI_API_KEY="${authKey}"`), authKey);
+  assert.strictEqual(findGoogleKey("F" + authKey), null);
+  assert.strictEqual(findGoogleKey(authKey + "c"), null);
+});

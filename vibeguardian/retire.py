@@ -93,7 +93,7 @@ def retire(
     # mint a replacement that nothing will ever use.
     deleted_at = keys.get(incident.old_key).get("deleteTime")
     if deleted_at:
-        return finish(ALREADY_DELETED, f"Google already deleted this key at {deleted_at}")
+        return finish(ALREADY_DELETED, f"the key was already deleted at {deleted_at}, by someone or something else (another responder, a person, or Google)")
 
     holders = secrets.find_holders(project, incident.leaked_fingerprint)
     uses = [use for holder in holders for use in run.consumers_of(project, holder.secret)]

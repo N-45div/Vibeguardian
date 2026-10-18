@@ -157,3 +157,15 @@ def test_watch_gives_up_at_the_deadline():
     )
     assert not result.reached
     assert result.probes == 4
+
+
+def test_a_deleted_authorization_key_is_dead():
+    # What Google answered for a real deleted "AQ." key, every probe for 3 minutes.
+    body = google_error(401, "ACCESS_TOKEN_TYPE_UNSUPPORTED", "API key not valid. Please pass a valid API key.")
+    assert classify(401, body) == (Verdict.DEAD, "ACCESS_TOKEN_TYPE_UNSUPPORTED")
+
+
+def test_a_401_with_another_message_is_not_proof_of_death():
+    body = google_error(401, "ACCESS_TOKEN_TYPE_UNSUPPORTED",
+                        "Request had invalid authentication credentials. Expected OAuth 2 access token.")
+    assert classify(401, body)[0] == Verdict.UNKNOWN

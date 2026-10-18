@@ -1,0 +1,30 @@
+{
+  "pipeline_id": "2960369802",
+  "commit": "6c523c8a3c1ef141b639c82cecea21341f0f1199",
+  "leaks": [
+    {
+      "kind": "google_api_key",
+      "rule": "GCPVertexExpressModeKey",
+      "file": "demo/app/main.py",
+      "line": 31,
+      "commit": "6c523c8a3c1ef141b639c82cecea21341f0f1199",
+      "fingerprint": "sha256:d93d90a8fe4d"
+    }
+  ],
+  "responses": [
+    {
+      "leak": {
+        "kind": "google_api_key",
+        "rule": "GCPVertexExpressModeKey",
+        "file": "demo/app/main.py",
+        "line": 31,
+        "commit": "6c523c8a3c1ef141b639c82cecea21341f0f1199",
+        "fingerprint": "sha256:d93d90a8fe4d"
+      },
+      "incident": {
+        "outcome": "error",
+        "reason": "GoogleApiError: HTTP 7: Permission 'iam.serviceAccountApiKeyBindings.create' denied on resource (or it may not exist). Remediate access with this Troubleshooter URL or share it with your administrator - https://console.cloud.google.com/iam-admin/troubleshooter/summary;errorId=CiQwMWExNGY2Mi1hMzljLTdjYjEtYTI3Zi03MTQyNjMyNTFiYTkSAA%3D%3D .\nHelp Token: Ad9DraAQZ-JH7JIMHdutA3jOcBNf-M8lI_GTXUUqeF9Ron06TOT5buLFlLxG9MjBOks5s9s6YJQ8mXW6YZyY3vgc3OsfIHJ87FY9Jsx7sSCkuNU6"
+      }
+    }
+  ]
+}

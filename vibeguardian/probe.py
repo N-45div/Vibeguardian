@@ -31,6 +31,12 @@ class Verdict(str, Enum):
 # google.rpc.ErrorInfo reasons that mean Google no longer accepts the key.
 DEAD_REASONS = frozenset({"API_KEY_INVALID", "API_KEY_EXPIRED"})
 
+# An authorization key ("AQ." + 50) that Google cannot validate, deleted ones
+# included, gets HTTP 401 with this reason and "API key not valid". A live key
+# can also get a 401 (for example, an OAuth-only API), but with a different
+# message, so both must match.
+AUTH_KEY_INVALID_REASON = "ACCESS_TOKEN_TYPE_UNSUPPORTED"
+
 # Reasons that prove Google looked the key up and still knows it.
 ALIVE_REASONS = frozenset(
     {
@@ -86,6 +92,8 @@ def classify(http_status: int, body: Any) -> tuple[Verdict, str | None]:
         return Verdict.ALIVE, None
     reason, message = _error_info(body)
     if reason in DEAD_REASONS:
+        return Verdict.DEAD, reason
+    if http_status == 401 and reason == AUTH_KEY_INVALID_REASON and message.startswith(_DEAD_MESSAGES):
         return Verdict.DEAD, reason
     if reason is None and http_status == 400 and message.startswith(_DEAD_MESSAGES):
         return Verdict.DEAD, "API_KEY_INVALID"

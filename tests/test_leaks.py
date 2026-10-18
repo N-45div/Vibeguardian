@@ -95,3 +95,28 @@ def test_same_key_in_one_file_is_reported_once(tmp_path):
         report(tmp_path, [finding(line=3), finding(line=9)]), read_line=lambda *a: KEY
     )
     assert len(leaks) == 1
+
+
+AUTH_KEY = "AQ." + "Ab8RN6" + "c" * 43 + "g"  # authorization key shape, built at runtime
+
+
+def test_regex_matches_authorization_keys_too():
+    assert len(AUTH_KEY) == 53
+    assert GOOGLE_API_KEY.fullmatch(AUTH_KEY)
+    assert GOOGLE_API_KEY.search(f'GEMINI_API_KEY="{AUTH_KEY}"').group(0) == AUTH_KEY
+    assert not GOOGLE_API_KEY.search("F" + AUTH_KEY)  # "FAQ." text
+    assert not GOOGLE_API_KEY.search(AUTH_KEY + "c")  # too long
+    assert not GOOGLE_API_KEY.search(AUTH_KEY[:-1])  # too short
+    assert not GOOGLE_API_KEY.search(AUTH_KEY[:-1] + "b")  # 37 bytes of base64 cannot end in "b"
+
+
+def test_an_authorization_key_finding_is_a_google_key(tmp_path):
+    report = tmp_path / "report.json"
+    report.write_text(json.dumps({"vulnerabilities": [{
+        "identifiers": [{"value": "GCPVertexExpressModeKey"}],
+        "raw_source_code_extract": f'KEY = "{AUTH_KEY}"',
+        "location": {"file": "app.py", "start_line": 3, "commit": {"sha": "c1"}},
+    }]}))
+    [leak] = read_leaks(report)
+    assert leak.kind == "google_api_key" and leak.value == AUTH_KEY
+    assert leak.public()["fingerprint"] == fingerprint(AUTH_KEY)

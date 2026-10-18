@@ -1,0 +1,75 @@
+{
+  "pipeline_id": "2960374385",
+  "commit": "0de12566e2cc09597e724ce4e53072b78a3a1934",
+  "leaks": [
+    {
+      "kind": "google_api_key",
+      "rule": "GCPVertexExpressModeKey",
+      "file": "demo/app/main.py",
+      "line": 31,
+      "commit": "6c523c8a3c1ef141b639c82cecea21341f0f1199",
+      "fingerprint": "sha256:d93d90a8fe4d"
+    }
+  ],
+  "responses": [
+    {
+      "leak": {
+        "kind": "google_api_key",
+        "rule": "GCPVertexExpressModeKey",
+        "file": "demo/app/main.py",
+        "line": 31,
+        "commit": "6c523c8a3c1ef141b639c82cecea21341f0f1199",
+        "fingerprint": "sha256:d93d90a8fe4d"
+      },
+      "incident": {
+        "leaked_fingerprint": "sha256:d93d90a8fe4d",
+        "outcome": "retired",
+        "old_key": "projects/895320568859/locations/global/keys/898893f9-74fa-4b9e-89c6-c0c5eb2a57de",
+        "new_key": "projects/895320568859/locations/global/keys/178aea7f-c393-4028-a2cb-154d59352868",
+        "new_fingerprint": "sha256:543e9d223dde",
+        "secrets": [],
+        "services": [],
+        "reason": null,
+        "approved_by": null,
+        "replacement_restrictions": null,
+        "started_at": 1792333476.482634,
+        "finished_at": 1792333485.8591998,
+        "timeline": [
+          {
+            "event": "identified",
+            "at": 1792333476.58,
+            "key": "projects/895320568859/locations/global/keys/898893f9-74fa-4b9e-89c6-c0c5eb2a57de"
+          },
+          {
+            "event": "consumers_found",
+            "at": 1792333476.87,
+            "secrets": [],
+            "services": []
+          },
+          {
+            "event": "replacement_created",
+            "at": 1792333480.375,
+            "key": "projects/895320568859/locations/global/keys/178aea7f-c393-4028-a2cb-154d59352868",
+            "fingerprint": "sha256:543e9d223dde",
+            "limited_to": null
+          },
+          {
+            "event": "replacement_live",
+            "at": 1792333485.764
+          },
+          {
+            "event": "old_key_deleted",
+            "at": 1792333485.859,
+            "key": "projects/895320568859/locations/global/keys/898893f9-74fa-4b9e-89c6-c0c5eb2a57de"
+          },
+          {
+            "event": "finished",
+            "at": 1792333485.859,
+            "outcome": "retired",
+            "reason": null
+          }
+        ]
+      }
+    }
+  ]
+}

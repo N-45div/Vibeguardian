@@ -1,6 +1,6 @@
 ---
 name: vibeguardian-leak-response
-description: Respond to a leaked Google Cloud API key without breaking production and without ever reading the key. Use when secret detection flags a Google API key (AIza...) in a commit, merge request, or pull request, or when someone reports that a key leaked.
+description: Respond to a leaked Google Cloud API key without breaking production and without ever reading the key. Use when secret detection flags a Google API key (classic AIza... or an AQ. authorization key) in a commit, merge request, or pull request, or when someone reports that a key leaked.
 ---
 
 # Leaked Google API key response

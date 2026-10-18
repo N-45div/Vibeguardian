@@ -18,8 +18,16 @@ from typing import Any, Callable
 
 from vibeguardian.secret import fingerprint
 
-# Google API keys: "AIza" followed by 35 URL-safe characters.
-GOOGLE_API_KEY = re.compile(r"AIza[0-9A-Za-z_\-]{35}(?![0-9A-Za-z_\-])")
+# Google API keys, in both formats Google issues:
+#   classic        "AIza" + 35 URL-safe characters (39 in all)
+#   authorization  "AQ." + 50 URL-safe characters (53 in all), bound to a
+#                  service account; what Google AI Studio issues since 2026.
+#                  50 characters of base64 for 37 bytes always end in A, Q, g
+#                  or w, and the left edge keeps "FAQ." text out.
+GOOGLE_API_KEY = re.compile(
+    r"AIza[0-9A-Za-z_\-]{35}(?![0-9A-Za-z_\-])"
+    r"|(?<![0-9A-Za-z_\-])AQ\.[0-9A-Za-z_\-]{49}[AQgw](?![0-9A-Za-z_\-])"
+)
 
 
 @dataclass(frozen=True)

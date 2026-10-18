@@ -147,6 +147,10 @@ leak-respond:
   stage: respond
   image: python:3.12  # has git, to read the leaked line from the commit
   extends: .google_identity
+  # One responder at a time across all pipelines: two pushes carrying the
+  # same leak must not both mint a replacement. The second finds the key
+  # already deleted and stops.
+  resource_group: leak-response
   needs:
     - job: secret_detection
       artifacts: true

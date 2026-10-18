@@ -106,5 +106,19 @@ def wait_operation(
         operation = check(http.get(f"{base_url}/{operation['name']}"))
     if "error" in operation:
         error = operation["error"]
-        raise GoogleApiError(int(error.get("code", 500)), str(error.get("message", "operation failed")))
+        code = int(error.get("code", 13))
+        message = str(error.get("message", "operation failed"))
+        if code in _RPC_TO_HTTP:  # operations report google.rpc.Code, not an HTTP status
+            name, status = _RPC_TO_HTTP[code]
+            raise GoogleApiError(status, f"{message} (operation failed with {name})", name)
+        raise GoogleApiError(code, message)
     return operation.get("response", {})
+
+
+# google.rpc.Code -> (name, the HTTP status Google maps it to).
+_RPC_TO_HTTP = {
+    1: ("CANCELLED", 499), 2: ("UNKNOWN", 500), 3: ("INVALID_ARGUMENT", 400), 4: ("DEADLINE_EXCEEDED", 504),
+    5: ("NOT_FOUND", 404), 6: ("ALREADY_EXISTS", 409), 7: ("PERMISSION_DENIED", 403), 8: ("RESOURCE_EXHAUSTED", 429),
+    9: ("FAILED_PRECONDITION", 400), 10: ("ABORTED", 409), 11: ("OUT_OF_RANGE", 400), 12: ("UNIMPLEMENTED", 501),
+    13: ("INTERNAL", 500), 14: ("UNAVAILABLE", 503), 15: ("DATA_LOSS", 500), 16: ("UNAUTHENTICATED", 401),
+}

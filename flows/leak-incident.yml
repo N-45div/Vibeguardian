@@ -191,7 +191,7 @@ prompts:
            if there is none, answer BRANCH_EXISTS.
         4. Commit with create_commit, using update actions that contain the
            full new content of each changed file. The content must not contain
-           "AIza" or "VIBEGUARDIAN_REDACTED". Message:
+           "AIza", "AQ." followed by a key, or "VIBEGUARDIAN_REDACTED". Message:
            fix: remove leaked Google API key sha256:HEX from code
         5. Open a merge request into the branch from ref.txt with
            create_merge_request. Title: Remove leaked Google API key

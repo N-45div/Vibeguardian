@@ -242,7 +242,7 @@ def check_record(
         end = _deleted_at(incident)
         if incident.get("outcome") == "already_deleted":
             reports.append({"fingerprint": fp, "verdict": "already_deleted",
-                            "summary": "Google had already deleted this key; the incident that deleted it "
+                            "summary": "This key was already deleted when this pipeline ran; the incident that deleted it "
                                        "covers who used it."})
             continue
         if end is None:

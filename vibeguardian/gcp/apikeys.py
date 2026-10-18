@@ -54,21 +54,30 @@ class ApiKeys:
         project: str,
         display_name: str,
         restrictions: dict[str, Any] | None = None,
+        service_account: str | None = None,
     ) -> dict[str, Any]:
-        """Create a key and return its resource once Google finishes."""
+        """Create a key and return its resource once Google finishes.
+
+        With ``service_account`` it is an authorization key ("AQ."), bound to
+        that account.
+        """
         payload: dict[str, Any] = {"displayName": display_name[:MAX_DISPLAY_NAME]}
         if restrictions:
             payload["restrictions"] = restrictions
+        if service_account:
+            payload["serviceAccountEmail"] = service_account
         operation = check(
             self._http.post(f"{BASE}/projects/{project}/locations/global/keys", json=payload)
         )
         return wait_operation(self._http, BASE, operation, **self._wait_kwargs)
 
     def clone(self, name: str, display_name: str, restrictions: dict[str, Any] | None = None) -> dict[str, Any]:
-        """Create a new key in the same project, with the same restrictions unless given others."""
+        """Create a new key in the same project, with the same restrictions unless given others,
+        bound to the same service account if the old one was an authorization key."""
         old = self.get(name)
         project = name.split("/")[1]
-        return self.create(project, display_name, restrictions or old.get("restrictions"))
+        return self.create(project, display_name, restrictions or old.get("restrictions"),
+                           service_account=old.get("serviceAccountEmail"))
 
     def delete(self, name: str) -> dict[str, Any]:
         """Delete a key. Google keeps it restorable for 30 days."""

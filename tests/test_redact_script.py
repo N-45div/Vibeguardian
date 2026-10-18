@@ -67,3 +67,16 @@ def test_clean_checkout_passes_with_nothing_to_do(tmp_path):
     result = run(repo)
     assert result.returncode == 0, result.stderr
     assert (repo / ".vibeguardian" / "redactions.txt").read_text() == ""
+
+
+def test_authorization_keys_are_redacted_and_their_dot_is_literal(tmp_path):
+    auth_key = "AQ." + "Ab8RN6" + "c" * 43 + "g"
+    lookalike = "AQx" + auth_key[3:]  # would match if "." were a wildcard; not a key
+    repo = make_repo(tmp_path, f'A = "{auth_key}"\nB = "{lookalike}"\n')
+    result = run(repo)
+    assert result.returncode == 0, result.stderr
+    hex12 = hashlib.sha256(auth_key.encode()).hexdigest()[:12]
+    text = (repo / "app.py").read_text()
+    assert auth_key not in text
+    assert f"VIBEGUARDIAN_REDACTED_{hex12}" in text
+    assert lookalike in text

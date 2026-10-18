@@ -13,9 +13,10 @@
 # the flow does not start with secrets in its checkout (fail closed).
 set -euo pipefail
 
-KEY_RE='AIza[0-9A-Za-z_-]{35}'
-# A real key is exactly 39 characters, so it must not touch another key
-# character on either side (ERE has no lookaround, so match the edges).
+# Classic keys ("AIza" + 35) and authorization keys ("AQ." + 50, ending in
+# A, Q, g or w). A key must not touch another key character on either side
+# (ERE has no lookaround, so match the edges).
+KEY_RE='(AIza[0-9A-Za-z_-]{35}|AQ\.[0-9A-Za-z_-]{49}[AQgw])'
 EDGE='[^0-9A-Za-z_-]'
 BOUNDED_RE="(^|${EDGE})${KEY_RE}(${EDGE}|\$)"
 out_dir=".vibeguardian"
@@ -43,7 +44,8 @@ for file in $files; do
   for key in $keys; do
     hex=$(printf '%s' "$key" | sha256sum | cut -c1-12)
     placeholder="VIBEGUARDIAN_REDACTED_${hex}"
-    sed -i -E "s/(^|${EDGE})${key}(${EDGE}|\$)/\1${placeholder}\2/g" "$file"
+    literal=$(printf '%s' "$key" | sed 's/\./\\./g')  # the "." in AQ. keys is literal
+    sed -i -E "s/(^|${EDGE})${literal}(${EDGE}|\$)/\1${placeholder}\2/g" "$file"
     for line in $(grep -n "$placeholder" "$file" | cut -d: -f1); do
       printf '%s:%s sha256:%s\n' "$file" "$line" "$hex" >> "$out"
       count=$((count + 1))

@@ -5,8 +5,9 @@
 
 const crypto = require("node:crypto");
 
-// "AIza" + 35 URL-safe characters, not glued to more key characters.
-const GOOGLE_API_KEY = /(?<![0-9A-Za-z_-])AIza[0-9A-Za-z_-]{35}(?![0-9A-Za-z_-])/;
+// Classic keys ("AIza" + 35) and authorization keys ("AQ." + 50, ending in
+// A, Q, g or w), not glued to more key characters.
+const GOOGLE_API_KEY = /(?<![0-9A-Za-z_-])(?:AIza[0-9A-Za-z_-]{35}|AQ\.[0-9A-Za-z_-]{49}[AQgw])(?![0-9A-Za-z_-])/;
 
 function findGoogleKey(text) {
   if (typeof text !== "string" || text.length > 100000) return null;

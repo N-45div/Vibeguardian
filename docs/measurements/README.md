@@ -313,6 +313,54 @@ HTTP 200. The proof waited for every vantage, so it held its verdict until
 Europe's own 12 in a row, at 177.9 s after deletion. This is the regional
 behaviour that made us ask from several places.
 
+## Authorization keys ("AQ.")
+
+Google's newer API key format is `AQ.` plus 50 URL-safe characters (53 in
+all), bound to a service account; Google calls these authorization keys, and
+Google AI Studio has issued only these since mid-2026. Until 2026-10-18
+VibeGuardian recognised only the classic `AIza` + 35 format, so a leaked
+authorization key would have gone unanswered. Now its detector, the
+redaction before the Duo agent, the companion and the vantages know both,
+and a replacement stays bound to the same service account.
+
+What Google answers for one (2026-10-18, from the laptop). A Gemini-only
+authorization key was created in the demo project, bound to a service account
+with no roles, then deleted:
+
+| When | Answer |
+|---|---|
+| Live, 6 probes | HTTP 200 every time |
+| Deleted, probed every 5 s for 3 minutes | **HTTP 401 `ACCESS_TOKEN_TYPE_UNSUPPORTED`, "API key not valid"**, from the first probe at 1.4 s, every time; never accepted again |
+
+A classic key's death is HTTP 400 `API_KEY_INVALID`, so the prover now also
+counts that 401 as dead, but only with the "API key not valid" message: a
+live key can get a 401 with other messages. Raw: [probe log](raw/2026-10-18-aq-key-deleted.jsonl).
+
+Drill 14 put the demo app on an authorization key and leaked it:
+
+- GitLab's own secret detection caught it (rule `GCPVertexExpressModeKey`).
+- The first responder run failed safely: creating a key bound to a service
+  account needs `iam.serviceAccountApiKeyBindings.create`, which `vg-retirer`
+  lacked. Nothing changed, and the prover reported the key still alive from
+  all five vantages. The fix is a custom role with only the three key-binding
+  permissions, granted to `vg-retirer` on that one service account.
+- The fix branch's pipeline then retired the key: a replacement bound to the
+  same account, the app rolled onto it and healthy, the old key deleted in
+  22.8 s. **Proven dead from all five vantages, 60 of 60**, every rejection
+  the new 401.
+- It also exposed a race. The fixer pushed two commits 15 s apart, and both
+  pipelines' responders worked on the same live key; the second found no
+  consumers (the first had already moved the secret) and minted a replacement
+  nothing used. The responders now share one GitLab `resource_group`, so they
+  run one at a time and the second finds the key already deleted. The extra
+  key was deleted.
+
+Raw: [first run](raw/2026-10-18-ci-drill14-incident-first.json),
+[retirement](raw/2026-10-18-ci-drill14-incident-fix-a.json),
+[the racing run](raw/2026-10-18-ci-drill14-incident-fix-b-race.json),
+[proof](raw/2026-10-18-ci-drill14-proof.json), [probe log](raw/2026-10-18-ci-drill14-prove.jsonl).
+
+## Retiring a leaked service-account key
 
 How: `demo/bootstrap_sa.py` creates a throwaway account (`vg-leaky-app`, read-only
 project metadata) with a key stored in Secret Manager. Treat that key as

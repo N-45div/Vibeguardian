@@ -85,3 +85,27 @@ def test_failed_operation_raises():
 def test_key_string_reads_the_value():
     api, _ = keys({("GET", f"{BASE}/{NAME}/keyString"): FakeResponse(200, {"keyString": "v"})})
     assert api.key_string(NAME) == "v"
+
+
+def test_clone_keeps_an_authorization_key_bound_to_its_service_account():
+    created = {"name": "operations/akmf.4", "done": True, "response": {"name": NAME + "4"}}
+    api, http = keys(
+        {
+            ("GET", f"{BASE}/{NAME}"): FakeResponse(200, {"name": NAME, "restrictions": RESTRICTIONS,
+                                                          "serviceAccountEmail": "gemini@p.iam.gserviceaccount.com"}),
+            ("POST", f"{BASE}/projects/123/locations/global/keys"): FakeResponse(200, created),
+        }
+    )
+    api.clone(NAME, "rotated")
+    assert http.calls[1][2]["json"]["serviceAccountEmail"] == "gemini@p.iam.gserviceaccount.com"
+
+
+def test_a_failed_operation_reports_the_http_status_for_its_rpc_code():
+    op = {"name": "operations/akmf.5", "done": True,
+          "error": {"code": 7, "message": "Permission 'iam.serviceAccountApiKeyBindings.create' denied"}}
+    api, _ = keys({("DELETE", f"{BASE}/{NAME}"): FakeResponse(200, op)})
+    with pytest.raises(GoogleApiError) as err:
+        api.delete(NAME)
+    assert err.value.http_status == 403
+    assert err.value.reason == "PERMISSION_DENIED"
+    assert "HTTP 403" in str(err.value) and "PERMISSION_DENIED" in str(err.value)
