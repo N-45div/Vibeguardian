@@ -1,0 +1,26 @@
+{
+  "reports": [
+    {
+      "fingerprint": "sha256:aae006dfde32",
+      "window": {
+        "start": "2026-10-11T12:53:07Z",
+        "end": "2026-10-11T12:54:26.982000Z"
+      },
+      "expected_regions": [
+        "us-central1"
+      ],
+      "calls_from_your_services": 224,
+      "calls_from_elsewhere": 0,
+      "elsewhere_by_region": {},
+      "by_region": {
+        "us-central1": {
+          "ok": 224,
+          "error": 0
+        }
+      },
+      "complete": true,
+      "verdict": "no_use_elsewhere",
+      "summary": "No successful calls with this key came from outside the regions its services run in."
+    }
+  ]
+}

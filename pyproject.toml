@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vibeguardian"
+version = "0.1.0"
+description = "Retires leaked Google Cloud keys and proves them dead."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+dependencies = [
+    "google-auth>=2.30",
+    "requests>=2.32",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8", "flask>=3.1"]
+
+[project.scripts]
+vg = "vibeguardian.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["vibeguardian*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

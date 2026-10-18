@@ -1,0 +1,72 @@
+{
+  "pipeline_id": "2952470181",
+  "commit": "af530d6ee331baba30858ed29c0bf854a4356b54",
+  "leaks": [
+    {
+      "kind": "google_api_key",
+      "rule": "GCP API key",
+      "file": "demo/app/main.py",
+      "line": 31,
+      "commit": "af530d6ee331baba30858ed29c0bf854a4356b54",
+      "fingerprint": "sha256:4ccada543d71"
+    }
+  ],
+  "responses": [
+    {
+      "leak": {
+        "kind": "google_api_key",
+        "rule": "GCP API key",
+        "file": "demo/app/main.py",
+        "line": 31,
+        "commit": "af530d6ee331baba30858ed29c0bf854a4356b54",
+        "fingerprint": "sha256:4ccada543d71"
+      },
+      "incident": {
+        "leaked_fingerprint": "sha256:4ccada543d71",
+        "outcome": "retired",
+        "old_key": "projects/895320568859/locations/global/keys/6092b254-106d-4892-b6f8-2c7fcc05b26b",
+        "new_key": "projects/895320568859/locations/global/keys/1323f57d-d6c3-4621-a50a-ff6520bea53f",
+        "new_fingerprint": "sha256:4ed1d639e079",
+        "secrets": [],
+        "services": [],
+        "reason": null,
+        "started_at": 1792091830.1460338,
+        "finished_at": 1792091838.7239625,
+        "timeline": [
+          {
+            "event": "identified",
+            "at": 1792091830.496,
+            "key": "projects/895320568859/locations/global/keys/6092b254-106d-4892-b6f8-2c7fcc05b26b"
+          },
+          {
+            "event": "consumers_found",
+            "at": 1792091830.716,
+            "secrets": [],
+            "services": []
+          },
+          {
+            "event": "replacement_created",
+            "at": 1792091833.324,
+            "key": "projects/895320568859/locations/global/keys/1323f57d-d6c3-4621-a50a-ff6520bea53f",
+            "fingerprint": "sha256:4ed1d639e079"
+          },
+          {
+            "event": "replacement_live",
+            "at": 1792091838.634
+          },
+          {
+            "event": "old_key_deleted",
+            "at": 1792091838.724,
+            "key": "projects/895320568859/locations/global/keys/6092b254-106d-4892-b6f8-2c7fcc05b26b"
+          },
+          {
+            "event": "finished",
+            "at": 1792091838.724,
+            "outcome": "retired",
+            "reason": null
+          }
+        ]
+      }
+    }
+  ]
+}

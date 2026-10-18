@@ -1,0 +1,17 @@
+{"ts": 1791955214.815, "event": "created", "method": "remove-roles", "key": "projects/inbound-aspect-476820-e6/serviceAccounts/vg-probe-target@inbound-aspect-476820-e6.iam.gserviceaccount.com/keys/c5e51c0c7bbc4f3330f1e1f90a6f5034635df8bb", "fingerprint": "sha256:19eac91b6d44"}
+{"ts": 1791955222.57, "event": "probe", "phase": "before", "verdict": "alive", "http_status": 200, "reason": null, "latency_ms": 1686, "at": 1791955220.883}
+{"ts": 1791955225.864, "event": "cutoff_applied", "method": "remove-roles", "at": 1791955225.864}
+{"ts": 1791955227.516, "event": "probe", "phase": "after_cutoff", "verdict": "alive", "http_status": 200, "reason": null, "latency_ms": 1648, "at": 1791955225.866}
+{"ts": 1791955239.186, "event": "probe", "phase": "after_cutoff", "verdict": "alive", "http_status": 200, "reason": null, "latency_ms": 1663, "at": 1791955237.522}
+{"ts": 1791955250.867, "event": "probe", "phase": "after_cutoff", "verdict": "alive", "http_status": 200, "reason": null, "latency_ms": 1678, "at": 1791955249.187}
+{"ts": 1791955262.557, "event": "probe", "phase": "after_cutoff", "verdict": "alive", "http_status": 200, "reason": null, "latency_ms": 1687, "at": 1791955260.868}
+{"ts": 1791955274.227, "event": "probe", "phase": "after_cutoff", "verdict": "alive", "http_status": 200, "reason": null, "latency_ms": 1669, "at": 1791955272.558}
+{"ts": 1791955285.937, "event": "probe", "phase": "after_cutoff", "verdict": "alive", "http_status": 200, "reason": null, "latency_ms": 1706, "at": 1791955284.229}
+{"ts": 1791955297.63, "event": "probe", "phase": "after_cutoff", "verdict": "alive", "http_status": 200, "reason": null, "latency_ms": 1690, "at": 1791955295.937}
+{"ts": 1791955309.351, "event": "probe", "phase": "after_cutoff", "verdict": "alive", "http_status": 200, "reason": null, "latency_ms": 1719, "at": 1791955307.63}
+{"ts": 1791955321.092, "event": "probe", "phase": "after_cutoff", "verdict": "dead", "http_status": 403, "reason": "ACCESS_CUT", "latency_ms": 1738, "at": 1791955319.352}
+{"ts": 1791955332.894, "event": "probe", "phase": "after_cutoff", "verdict": "dead", "http_status": 403, "reason": "ACCESS_CUT", "latency_ms": 1800, "at": 1791955331.093}
+{"ts": 1791955344.709, "event": "probe", "phase": "after_cutoff", "verdict": "dead", "http_status": 403, "reason": "ACCESS_CUT", "latency_ms": 1812, "at": 1791955342.895}
+{"ts": 1791955344.709, "event": "summary", "method": "remove-roles", "reached": true, "token_had_access_before": true, "seconds_until_stolen_token_cut": 93.5, "flaps": 0, "probes": 11}
+{"ts": 1791955346.961, "event": "cutoff_undone", "method": "remove-roles"}
+{"ts": 1791955347.346, "event": "cleanup_deleted", "key": "projects/inbound-aspect-476820-e6/serviceAccounts/vg-probe-target@inbound-aspect-476820-e6.iam.gserviceaccount.com/keys/c5e51c0c7bbc4f3330f1e1f90a6f5034635df8bb"}

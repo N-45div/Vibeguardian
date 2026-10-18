@@ -1,0 +1,284 @@
+# VibeGuardian pipeline.
+#
+# On every push GitLab's secret detection scans the new commits. If a Google
+# API key leaked, VibeGuardian answers in three separate jobs:
+#
+#   leak-respond  (identity: vg-retirer)  rolls out a replacement and retires the key
+#   leak-prove    (identity: vg-prover)   asks Google, repeatedly and from 5 places, whether the key still works
+#   leak-exposure (identity: vg-watcher)  reads who used the key while it was public
+#   leak-telemetry (NO cloud identity)    sends the incident to GitLab Observability
+#   leak-gate                             keeps the pipeline red while the key is in the code
+#
+# .vibeguardian.toml (read from the default branch) says what may happen
+# without a person. A retirement it holds back waits for someone to press
+# play on leak-approve; leak-prove-approved and leak-gate-approved follow.
+#
+# Google Cloud access uses Workload Identity Federation: a job that needs it
+# trades its GitLab ID token for a short-lived token for one narrow service
+# account. No Google key is stored in GitLab.
+
+include:
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
+  - template: Jobs/Container-Scanning.gitlab-ci.yml
+
+stages:
+  - test
+  - verify
+  - package
+  - release
+  - respond
+  - prove
+  - monitor
+  - gate
+
+variables:
+  GCP_PROJECT_ID: inbound-aspect-476820-e6
+  GCP_PROJECT_NUMBER: "895320568859"
+  GCP_POOL: gitlab
+  GCP_PROVIDER: gitlab-com
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  # GitLab Observability for this group (Observe > Setup). OTLP over HTTP.
+  VG_OTLP_ENDPOINT: https://144399311.otel.gitlab-o11y.com:14318
+  # The prover's vantage service: one private copy per region, so Google is
+  # asked from several continents, not only from the CI runner.
+  VANTAGE_REGIONS: europe-west1 asia-northeast1 australia-southeast1 southamerica-east1
+  VANTAGE_IMAGE: $CI_REGISTRY_IMAGE/vantage:$CI_COMMIT_SHA
+  VANTAGE_AR_IMAGE: us-central1-docker.pkg.dev/$GCP_PROJECT_ID/vibeguardian/vantage:$CI_COMMIT_SHA
+
+default:
+  image: python:3.12-slim
+  cache:
+    key: pip
+    paths: [.cache/pip]
+
+.google_identity:
+  id_tokens:
+    GCP_ID_TOKEN:
+      aud: https://iam.googleapis.com/projects/895320568859/locations/global/workloadIdentityPools/gitlab/providers/gitlab-com
+
+unit-tests:
+  stage: test
+  script:
+    - pip install -q -e ".[test]"
+    - pytest -q --junitxml=report.xml
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
+
+# Keep the report as a plain artifact too, so the leak jobs can read it.
+secret_detection:
+  artifacts:
+    paths: [gl-secret-detection-report.json]
+
+# Proves each CI identity can reach Google with no stored key.
+google-identity:
+  stage: verify
+  extends: .google_identity
+  parallel:
+    matrix:
+      - IDENTITY: [vg-retirer, vg-deployer]
+        CHECK: cloud-run
+      - IDENTITY: vg-watcher
+        CHECK: monitoring
+      - IDENTITY: vg-prover
+        CHECK: vantage
+  script:
+    - pip install -q -e .
+    - vg ci-auth --service-account "$IDENTITY@$GCP_PROJECT_ID.iam.gserviceaccount.com"
+    - export GOOGLE_APPLICATION_CREDENTIALS="$CI_PROJECT_DIR/.gcp.creds.json"
+    - python ci/whoami.py
+
+# Build, scan and deploy the vantage service, on main when its code changes
+# (or by hand). Each step is its own job, so the deploy only ever ships an
+# image that was pushed to GitLab's registry and scanned there first.
+.vantage_release:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes: [demo/vantage/**/*, vibeguardian/probe.py, vibeguardian/leaks.py, vibeguardian/secret.py,
+                vibeguardian/gcp/cloudrun.py]
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
+      allow_failure: true
+
+vantage-image:
+  stage: package
+  image: docker:27
+  services: [docker:27-dind]
+  extends: [.google_identity, .vantage_release]
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  script:
+    - apk add --no-cache python3 >/dev/null
+    - python3 -m venv /tmp/vg && /tmp/vg/bin/pip install -q -e .
+    - docker build -f demo/vantage/Dockerfile -t "$VANTAGE_IMAGE" -t "$VANTAGE_AR_IMAGE" .
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker push "$VANTAGE_IMAGE"
+    - /tmp/vg/bin/vg ci-auth --service-account "vg-deployer@$GCP_PROJECT_ID.iam.gserviceaccount.com"
+    - export GOOGLE_APPLICATION_CREDENTIALS="$CI_PROJECT_DIR/.gcp.creds.json"
+    - /tmp/vg/bin/python ci/docker_login.py us-central1-docker.pkg.dev
+    - docker push "$VANTAGE_AR_IMAGE"
+
+# Rules set here, not through extends: the template's own rules would win.
+container_scanning:
+  stage: package
+  rules: !reference [.vantage_release, rules]
+  needs: [vantage-image]
+  variables:
+    CS_IMAGE: $VANTAGE_IMAGE
+
+# Deploys as vg-deployer. The service runs as vg-vantage, which has no roles,
+# and only vg-prover may call it.
+deploy-vantage:
+  stage: release
+  extends: [.google_identity, .vantage_release]
+  needs: [vantage-image, container_scanning]
+  environment:
+    name: vantage
+  script:
+    - pip install -q -e .
+    - vg ci-auth --service-account "vg-deployer@$GCP_PROJECT_ID.iam.gserviceaccount.com"
+    - export GOOGLE_APPLICATION_CREDENTIALS="$CI_PROJECT_DIR/.gcp.creds.json"
+    - vg deploy-vantage --project "$GCP_PROJECT_ID" --image "$VANTAGE_AR_IMAGE"
+        $(for r in $VANTAGE_REGIONS; do printf -- '--region %s ' "$r"; done)
+        --invoker "serviceAccount:vg-prover@$GCP_PROJECT_ID.iam.gserviceaccount.com"
+
+leak-respond:
+  stage: respond
+  image: python:3.12  # has git, to read the leaked line from the commit
+  extends: .google_identity
+  needs:
+    - job: secret_detection
+      artifacts: true
+  script:
+    - pip install -q -e .
+    # The policy comes from the default branch, so a push cannot loosen it.
+    - git fetch -q --depth 1 origin "$CI_DEFAULT_BRANCH"
+    - git show FETCH_HEAD:.vibeguardian.toml > .policy.toml 2>/dev/null || true
+    - vg ci-auth --service-account "vg-retirer@$GCP_PROJECT_ID.iam.gserviceaccount.com"
+    - export GOOGLE_APPLICATION_CREDENTIALS="$CI_PROJECT_DIR/.gcp.creds.json"
+    - vg respond --project "$GCP_PROJECT_ID" --policy .policy.toml --incident incident.json --out respond.jsonl
+        ${APPROVE:+--approved-by "$GITLAB_USER_LOGIN"}
+  artifacts:
+    when: always
+    expire_in: 90 days
+    paths: [incident.json, respond.jsonl]
+
+# The approval gate. When the policy holds a retirement back, leak-respond
+# changes nothing and the incident says why. A person presses play here to
+# retire the key anyway; GitLab records who did, and so does the incident.
+leak-approve:
+  extends: leak-respond
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+      when: manual
+      allow_failure: true
+  variables:
+    APPROVE: "1"
+
+# Recovers the leaked values from the repository itself and asks Google
+# whether they still work: from this runner, and through the vantage services
+# from four other regions. Its only identity, vg-prover, can call those
+# services and nothing else, so it cannot change anything or take the
+# responder's word.
+leak-prove:
+  stage: prove
+  image: python:3.12
+  extends: .google_identity
+  when: always  # runs even if leak-respond failed: the proof must not depend on it
+  needs:
+    - job: secret_detection
+      artifacts: true
+    - job: leak-respond
+      artifacts: true  # read only to decide how long to watch each key
+  script:
+    - pip install -q -e .
+    - vg ci-auth --service-account "vg-prover@$GCP_PROJECT_ID.iam.gserviceaccount.com"
+    - export GOOGLE_APPLICATION_CREDENTIALS="$CI_PROJECT_DIR/.gcp.creds.json"
+    - vg prove-leaks --incident incident.json --proof proof.json --out prove.jsonl
+        --vantage-identity "vg-prover@$GCP_PROJECT_ID.iam.gserviceaccount.com"
+        $(for r in $VANTAGE_REGIONS; do printf -- '--vantage %s=https://vg-vantage-%s.%s.run.app ' "$r" "$GCP_PROJECT_NUMBER" "$r"; done)
+  artifacts:
+    when: always
+    expire_in: 90 days
+    paths: [proof.json, prove.jsonl]
+
+# Did anyone besides the key's own services use it while it was public?
+# vg-watcher can only read Cloud Monitoring. Runs beside leak-prove. It waits
+# 90 s after the key was deleted, since calls took 63 s to show up when we
+# measured, and marks its answer partial until Google's 30-minute delay passes.
+leak-exposure:
+  stage: monitor
+  image: python:3.12  # has git, to date the leak commit
+  extends: .google_identity
+  allow_failure: true  # informs the incident; never decides the gate
+  needs:
+    - job: leak-respond
+      artifacts: true
+  script:
+    - pip install -q -e .
+    - vg ci-auth --service-account "vg-watcher@$GCP_PROJECT_ID.iam.gserviceaccount.com"
+    - export GOOGLE_APPLICATION_CREDENTIALS="$CI_PROJECT_DIR/.gcp.creds.json"
+    - vg exposure --project "$GCP_PROJECT_ID" --incident incident.json --settle 90 --out exposure.json
+  artifacts:
+    when: always
+    expire_in: 90 days
+    paths: [exposure.json]
+
+# Each incident becomes a trace in GitLab Observability (a span per retire
+# step, plus the proof), with exposure counts as metrics and verdicts as logs.
+# Fingerprints and resource names only. GitLab separately exports the
+# pipeline's own telemetry, since the group sets GITLAB_OBSERVABILITY_EXPORT.
+leak-telemetry:
+  stage: monitor
+  when: always
+  allow_failure: true  # telemetry never decides the gate
+  needs:
+    - job: leak-respond
+      artifacts: true
+    - job: leak-prove
+      artifacts: true
+    - job: leak-exposure
+      artifacts: true
+  script:
+    - pip install -q -e .
+    - vg telemetry --incident incident.json --proof proof.json --exposure exposure.json
+
+# The proof and the gate again, for a retirement a person approved.
+leak-prove-approved:
+  extends: leak-prove
+  when: on_success
+  needs:
+    - job: secret_detection
+      artifacts: true
+    - job: leak-approve
+      artifacts: true
+
+leak-gate-approved:
+  extends: leak-gate
+  when: on_success
+  needs:
+    - job: secret_detection
+      artifacts: true
+    - job: leak-approve
+      artifacts: true
+    - job: leak-prove-approved
+      artifacts: true
+
+# Red while a leaked key is in the current code, or is not proven dead.
+# A key left only in history passes once Google has rejected it: a dead key
+# in history is harmless, so no history rewrite is needed.
+leak-gate:
+  stage: gate
+  image: python:3.12  # has git, to check the current tree
+  when: always
+  needs:
+    - job: secret_detection
+      artifacts: true
+    - job: leak-respond
+      artifacts: true
+    - job: leak-prove
+      artifacts: true
+  script:
+    - pip install -q -e .
+    - vg gate --incident incident.json --proof proof.json

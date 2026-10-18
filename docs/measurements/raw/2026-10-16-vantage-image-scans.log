@@ -1,0 +1,8 @@
+# GitLab Container Scanning (Trivy) on the vantage image, one run per base image, 2026-10-16.
+# Counts by severity from each job's gl-container-scanning-report.json.
+base | commit | job | total | by severity
+python:3.12-slim (Debian 13) | 02ee538c | 17246425523 | 166 | High 44, Medium 58, Low 61, Unknown 3
+gcr.io/distroless/python3-debian12:nonroot | cebb49b8 | 17246887557 | 291 | Critical 2, High 61, Medium 148, Low 77, Unknown 3
+cgr.dev/chainguard/python:latest (Wolfi) | 28443a6d | 17246984661 | 0 | 
+# Chainguard run: Trivy detected OS 'wolfi 20230201' and 30 packages in its SBOM
+# (python-3.15, glibc-2.44, openssl-4.0, ...), with no known vulnerabilities.

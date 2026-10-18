@@ -1,0 +1,10 @@
+{"ts": 1791955157.862, "event": "created", "method": "disable-sa", "key": "projects/inbound-aspect-476820-e6/serviceAccounts/vg-probe-target@inbound-aspect-476820-e6.iam.gserviceaccount.com/keys/900db2062a8ccd1aff59ac984fb349bb903c143a", "fingerprint": "sha256:245b259a3e65"}
+{"ts": 1791955170.933, "event": "probe", "phase": "before", "verdict": "alive", "http_status": 200, "reason": null, "latency_ms": 1659, "at": 1791955169.272}
+{"ts": 1791955173.04, "event": "cutoff_applied", "method": "disable-sa", "at": 1791955173.04}
+{"ts": 1791955174.731, "event": "probe", "phase": "after_cutoff", "verdict": "alive", "http_status": 200, "reason": null, "latency_ms": 1690, "at": 1791955173.04}
+{"ts": 1791955186.335, "event": "probe", "phase": "after_cutoff", "verdict": "dead", "http_status": 401, "reason": "ACCESS_CUT", "latency_ms": 1600, "at": 1791955184.732}
+{"ts": 1791955197.936, "event": "probe", "phase": "after_cutoff", "verdict": "dead", "http_status": 401, "reason": "ACCESS_CUT", "latency_ms": 1599, "at": 1791955196.336}
+{"ts": 1791955209.529, "event": "probe", "phase": "after_cutoff", "verdict": "dead", "http_status": 401, "reason": "ACCESS_CUT", "latency_ms": 1592, "at": 1791955207.936}
+{"ts": 1791955209.529, "event": "summary", "method": "disable-sa", "reached": true, "token_had_access_before": true, "seconds_until_stolen_token_cut": 11.7, "flaps": 0, "probes": 4}
+{"ts": 1791955209.916, "event": "cutoff_undone", "method": "disable-sa"}
+{"ts": 1791955211.215, "event": "cleanup_deleted", "key": "projects/inbound-aspect-476820-e6/serviceAccounts/vg-probe-target@inbound-aspect-476820-e6.iam.gserviceaccount.com/keys/900db2062a8ccd1aff59ac984fb349bb903c143a"}

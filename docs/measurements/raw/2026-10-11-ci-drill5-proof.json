@@ -1,0 +1,14 @@
+{
+  "stable_required": 12,
+  "keys": {
+    "sha256:aae006dfde32": {
+      "dead": true,
+      "watch": "full",
+      "probes": 12,
+      "flaps": 0,
+      "seconds_watched": 57.5,
+      "first_dead_at": 1791723305.9188297,
+      "stable_dead_at": 1791723363.180116
+    }
+  }
+}

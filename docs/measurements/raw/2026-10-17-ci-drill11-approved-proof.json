@@ -1,0 +1,80 @@
+{
+  "stable_required": 12,
+  "keys": {
+    "sha256:e0c339fad6a9": {
+      "dead": true,
+      "state": "proven_dead",
+      "accepted": 3,
+      "rejected": 72,
+      "watch": "full",
+      "probes": 75,
+      "flaps": 2,
+      "seconds_watched": 139.4,
+      "first_dead_at": 1792271155.1473222,
+      "stable_dead_at": 1792271293.883553,
+      "unreachable": [],
+      "vantages": {
+        "runner": {
+          "dead": true,
+          "state": "proven_dead",
+          "accepted": 0,
+          "rejected": 12,
+          "watch": "full",
+          "probes": 12,
+          "flaps": 0,
+          "seconds_watched": 57.2,
+          "first_dead_at": 1792271155.1473222,
+          "stable_dead_at": 1792271212.1409159
+        },
+        "europe-west1": {
+          "dead": true,
+          "state": "proven_dead",
+          "accepted": 2,
+          "rejected": 24,
+          "watch": "full",
+          "probes": 26,
+          "flaps": 2,
+          "seconds_watched": 139.4,
+          "first_dead_at": 1792271232.9441242,
+          "stable_dead_at": 1792271293.883553
+        },
+        "asia-northeast1": {
+          "dead": true,
+          "state": "proven_dead",
+          "accepted": 0,
+          "rejected": 12,
+          "watch": "full",
+          "probes": 12,
+          "flaps": 0,
+          "seconds_watched": 67.8,
+          "first_dead_at": 1792271155.1495523,
+          "stable_dead_at": 1792271221.8762238
+        },
+        "australia-southeast1": {
+          "dead": true,
+          "state": "proven_dead",
+          "accepted": 0,
+          "rejected": 12,
+          "watch": "full",
+          "probes": 12,
+          "flaps": 0,
+          "seconds_watched": 80.9,
+          "first_dead_at": 1792271155.1502788,
+          "stable_dead_at": 1792271229.4324958
+        },
+        "southamerica-east1": {
+          "dead": true,
+          "state": "proven_dead",
+          "accepted": 1,
+          "rejected": 12,
+          "watch": "full",
+          "probes": 13,
+          "flaps": 0,
+          "seconds_watched": 78.4,
+          "first_dead_at": 1792271162.2345679,
+          "stable_dead_at": 1792271232.536865
+        }
+      }
+    }
+  }
+}

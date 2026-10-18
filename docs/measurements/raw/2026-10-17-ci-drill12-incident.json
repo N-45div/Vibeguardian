@@ -1,0 +1,117 @@
+{
+  "pipeline_id": "2959123252",
+  "commit": "31d01b772898149c412ac720a4ec56d4d89f85f4",
+  "leaks": [
+    {
+      "kind": "google_api_key",
+      "rule": "GCP API key",
+      "file": "demo/app/main.py",
+      "line": 31,
+      "commit": "31d01b772898149c412ac720a4ec56d4d89f85f4",
+      "fingerprint": "sha256:49faff11caaa"
+    }
+  ],
+  "responses": [
+    {
+      "leak": {
+        "kind": "google_api_key",
+        "rule": "GCP API key",
+        "file": "demo/app/main.py",
+        "line": 31,
+        "commit": "31d01b772898149c412ac720a4ec56d4d89f85f4",
+        "fingerprint": "sha256:49faff11caaa"
+      },
+      "incident": {
+        "leaked_fingerprint": "sha256:49faff11caaa",
+        "outcome": "retired",
+        "old_key": "projects/895320568859/locations/global/keys/c9a609ca-55bb-4206-b73c-eefc680df595",
+        "new_key": "projects/895320568859/locations/global/keys/9d1aaf14-366b-406c-b28d-e1c3fb0cfeed",
+        "new_fingerprint": "sha256:3d516f175d0b",
+        "secrets": [
+          {
+            "secret": "projects/895320568859/secrets/gemini-api-key",
+            "old_version": "projects/895320568859/secrets/gemini-api-key/versions/13"
+          }
+        ],
+        "services": [
+          {
+            "service": "projects/inbound-aspect-476820-e6/locations/us-central1/services/vg-demo",
+            "revision": "projects/inbound-aspect-476820-e6/locations/us-central1/services/vg-demo/revisions/vg-demo-00013-f8b",
+            "healthy": true,
+            "detail": "/health 200 on sha256:3d516f175d0b"
+          }
+        ],
+        "reason": null,
+        "approved_by": null,
+        "replacement_restrictions": {
+          "apiTargets": [
+            {
+              "service": "generativelanguage.googleapis.com"
+            }
+          ]
+        },
+        "started_at": 1792271509.4121513,
+        "finished_at": 1792271532.8055964,
+        "timeline": [
+          {
+            "event": "identified",
+            "at": 1792271509.521,
+            "key": "projects/895320568859/locations/global/keys/c9a609ca-55bb-4206-b73c-eefc680df595"
+          },
+          {
+            "event": "consumers_found",
+            "at": 1792271510.234,
+            "secrets": [
+              "projects/895320568859/secrets/gemini-api-key"
+            ],
+            "services": [
+              "projects/inbound-aspect-476820-e6/locations/us-central1/services/vg-demo"
+            ]
+          },
+          {
+            "event": "replacement_created",
+            "at": 1792271513.526,
+            "key": "projects/895320568859/locations/global/keys/9d1aaf14-366b-406c-b28d-e1c3fb0cfeed",
+            "fingerprint": "sha256:3d516f175d0b",
+            "limited_to": [
+              "generativelanguage.googleapis.com"
+            ]
+          },
+          {
+            "event": "replacement_live",
+            "at": 1792271518.922
+          },
+          {
+            "event": "secret_version_added",
+            "at": 1792271519.641,
+            "secret": "projects/895320568859/secrets/gemini-api-key",
+            "version": "projects/895320568859/secrets/gemini-api-key/versions/14"
+          },
+          {
+            "event": "service_rolled",
+            "at": 1792271529.977,
+            "service": "projects/inbound-aspect-476820-e6/locations/us-central1/services/vg-demo",
+            "healthy": true,
+            "detail": "/health 200 on sha256:3d516f175d0b"
+          },
+          {
+            "event": "old_key_deleted",
+            "at": 1792271532.549,
+            "key": "projects/895320568859/locations/global/keys/c9a609ca-55bb-4206-b73c-eefc680df595"
+          },
+          {
+            "event": "old_version_disabled",
+            "at": 1792271532.806,
+            "version": "projects/895320568859/secrets/gemini-api-key/versions/13"
+          },
+          {
+            "event": "finished",
+            "at": 1792271532.806,
+            "outcome": "retired",
+            "reason": null
+          }
+        ]
+      }
+    }
+  ]
+}

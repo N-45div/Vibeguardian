@@ -1,0 +1,66 @@
+{
+  "reports": [
+    {
+      "fingerprint": "sha256:e0c339fad6a9",
+      "window": {
+        "start": "2026-10-17T20:57:35Z",
+        "end": "2026-10-17T21:05:15.942000Z"
+      },
+      "expected_regions": [
+        "us-central1"
+      ],
+      "calls_from_your_services": 0,
+      "calls_from_elsewhere": 0,
+      "succeeded_from_elsewhere": 0,
+      "elsewhere_by_region": {},
+      "checks_from_elsewhere": 0,
+      "checks_by_region": {},
+      "likely_vibeguardian_probes": 107,
+      "by_region": {
+        "asia-east1": {
+          "ok": 39,
+          "error": 0,
+          "used_ok": 0,
+          "used_failed": 0,
+          "checks": 0,
+          "probe_like": 39
+        },
+        "asia-southeast1": {
+          "ok": 1,
+          "error": 0,
+          "used_ok": 0,
+          "used_failed": 0,
+          "checks": 0,
+          "probe_like": 1
+        },
+        "europe-west1": {
+          "ok": 23,
+          "error": 0,
+          "used_ok": 0,
+          "used_failed": 0,
+          "checks": 0,
+          "probe_like": 23
+        },
+        "us-east4": {
+          "ok": 31,
+          "error": 0,
+          "used_ok": 0,
+          "used_failed": 0,
+          "checks": 0,
+          "probe_like": 31
+        },
+        "us-south1": {
+          "ok": 13,
+          "error": 0,
+          "used_ok": 0,
+          "used_failed": 0,
+          "checks": 0,
+          "probe_like": 13
+        }
+      },
+      "complete": true,
+      "verdict": "no_use_elsewhere",
+      "summary": "No successful calls with this key came from outside the regions its services run in. 107 model-list call(s) from other regions came after VibeGuardian began checking the key; its own probes make that call, so they are not counted."
+    }
+  ]
+}

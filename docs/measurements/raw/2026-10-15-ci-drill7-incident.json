@@ -1,0 +1,106 @@
+{
+  "pipeline_id": "2952447335",
+  "commit": "af530d6ee331baba30858ed29c0bf854a4356b54",
+  "leaks": [
+    {
+      "kind": "google_api_key",
+      "rule": "GCP API key",
+      "file": "demo/app/main.py",
+      "line": 31,
+      "commit": "af530d6ee331baba30858ed29c0bf854a4356b54",
+      "fingerprint": "sha256:4ccada543d71"
+    }
+  ],
+  "responses": [
+    {
+      "leak": {
+        "kind": "google_api_key",
+        "rule": "GCP API key",
+        "file": "demo/app/main.py",
+        "line": 31,
+        "commit": "af530d6ee331baba30858ed29c0bf854a4356b54",
+        "fingerprint": "sha256:4ccada543d71"
+      },
+      "incident": {
+        "leaked_fingerprint": "sha256:4ccada543d71",
+        "outcome": "retired",
+        "old_key": "projects/895320568859/locations/global/keys/6092b254-106d-4892-b6f8-2c7fcc05b26b",
+        "new_key": "projects/895320568859/locations/global/keys/186f6233-f9fe-4841-afab-4800d380aa75",
+        "new_fingerprint": "sha256:030f2157953f",
+        "secrets": [
+          {
+            "secret": "projects/895320568859/secrets/gemini-api-key",
+            "old_version": "projects/895320568859/secrets/gemini-api-key/versions/8"
+          }
+        ],
+        "services": [
+          {
+            "service": "projects/inbound-aspect-476820-e6/locations/us-central1/services/vg-demo",
+            "revision": "projects/inbound-aspect-476820-e6/locations/us-central1/services/vg-demo/revisions/vg-demo-00008-x4h",
+            "healthy": true,
+            "detail": "/health 200 on sha256:030f2157953f"
+          }
+        ],
+        "reason": null,
+        "started_at": 1792091410.9905305,
+        "finished_at": 1792091437.1772335,
+        "timeline": [
+          {
+            "event": "identified",
+            "at": 1792091411.222,
+            "key": "projects/895320568859/locations/global/keys/6092b254-106d-4892-b6f8-2c7fcc05b26b"
+          },
+          {
+            "event": "consumers_found",
+            "at": 1792091417.159,
+            "secrets": [
+              "projects/895320568859/secrets/gemini-api-key"
+            ],
+            "services": [
+              "projects/inbound-aspect-476820-e6/locations/us-central1/services/vg-demo"
+            ]
+          },
+          {
+            "event": "replacement_created",
+            "at": 1792091419.908,
+            "key": "projects/895320568859/locations/global/keys/186f6233-f9fe-4841-afab-4800d380aa75",
+            "fingerprint": "sha256:030f2157953f"
+          },
+          {
+            "event": "replacement_live",
+            "at": 1792091425.304
+          },
+          {
+            "event": "secret_version_added",
+            "at": 1792091425.916,
+            "secret": "projects/895320568859/secrets/gemini-api-key",
+            "version": "projects/895320568859/secrets/gemini-api-key/versions/9"
+          },
+          {
+            "event": "service_rolled",
+            "at": 1792091434.607,
+            "service": "projects/inbound-aspect-476820-e6/locations/us-central1/services/vg-demo",
+            "healthy": true,
+            "detail": "/health 200 on sha256:030f2157953f"
+          },
+          {
+            "event": "old_key_deleted",
+            "at": 1792091436.987,
+            "key": "projects/895320568859/locations/global/keys/6092b254-106d-4892-b6f8-2c7fcc05b26b"
+          },
+          {
+            "event": "old_version_disabled",
+            "at": 1792091437.177,
+            "version": "projects/895320568859/secrets/gemini-api-key/versions/8"
+          },
+          {
+            "event": "finished",
+            "at": 1792091437.177,
+            "outcome": "retired",
+            "reason": null
+          }
+        ]
+      }
+    }
+  ]
+}

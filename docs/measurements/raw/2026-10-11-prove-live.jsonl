@@ -1,0 +1,13 @@
+{"ts": 1791665213.602, "event": "probe", "fingerprint": "sha256:88e943394b81", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 691, "at": 1791665212.91}
+{"ts": 1791665222.166, "event": "probe", "fingerprint": "sha256:88e943394b81", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 3559, "at": 1791665218.604}
+{"ts": 1791665230.461, "event": "probe", "fingerprint": "sha256:88e943394b81", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 3287, "at": 1791665227.171}
+{"ts": 1791665238.72, "event": "probe", "fingerprint": "sha256:88e943394b81", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 3246, "at": 1791665235.471}
+{"ts": 1791665247.06, "event": "probe", "fingerprint": "sha256:88e943394b81", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 3321, "at": 1791665243.735}
+{"ts": 1791665255.695, "event": "probe", "fingerprint": "sha256:88e943394b81", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 3627, "at": 1791665252.064}
+{"ts": 1791665264.254, "event": "probe", "fingerprint": "sha256:88e943394b81", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 3555, "at": 1791665260.697}
+{"ts": 1791665272.888, "event": "probe", "fingerprint": "sha256:88e943394b81", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 3619, "at": 1791665269.259}
+{"ts": 1791665281.194, "event": "probe", "fingerprint": "sha256:88e943394b81", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 3298, "at": 1791665277.893}
+{"ts": 1791665289.801, "event": "probe", "fingerprint": "sha256:88e943394b81", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 3600, "at": 1791665286.198}
+{"ts": 1791665298.05, "event": "probe", "fingerprint": "sha256:88e943394b81", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 3238, "at": 1791665294.806}
+{"ts": 1791665306.46, "event": "probe", "fingerprint": "sha256:88e943394b81", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 3399, "at": 1791665303.054}
+{"ts": 1791665306.46, "event": "verdict", "fingerprint": "sha256:88e943394b81", "dead": true, "probes": 12, "flaps": 0, "seconds_watched": 93.5, "first_dead_at": 1791665212.9098427, "stable_dead_at": 1791665303.0544093}

@@ -1,0 +1,16 @@
+# Which Google region served each vantage's calls (Cloud Monitoring
+# serviceruntime request_count, credential_id = apikey:UNKNOWN, by location).
+# A dead key was sent through each vantage a distinct number of times
+# (1, 2, 4, 8) so the per-region totals decode uniquely. No pipeline was
+# running in the window. Probes sent 20:49:11-20:49:27 UTC, 2026-10-16.
+sent: europe-west1 1, asia-northeast1 2, australia-southeast1 4, southamerica-east1 8
+window 20:49:00 -> 20:51:33
+  served in asia-east1           rejected 6
+  served in europe-west1         rejected 1
+  served in us-east4             rejected 8
+# Drill 9 (pipeline 2956971464, 12 probes from each of runner + 4 vantages),
+# window 20:39:00 -> 20:43:32:
+  served in asia-east1           rejected 24
+  served in europe-west1         rejected 12
+  served in us-east4             rejected 23
+  served in us-south1            rejected 1

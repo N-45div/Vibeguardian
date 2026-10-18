@@ -1,0 +1,11 @@
+{"ts": 1791663834.534, "event": "created", "key": "projects/895320568859/locations/global/keys/0af7457b-0147-4d62-be0f-dbf2a5267843", "fingerprint": "sha256:3f8847d77151"}
+{"ts": 1791663837.499, "event": "probe", "phase": "before_delete", "verdict": "alive", "http_status": 200, "reason": null, "latency_ms": 2956, "at": 1791663834.534}
+{"ts": 1791663837.905, "event": "lookup", "matched": true}
+{"ts": 1791663842.223, "event": "deleted", "at": 1791663842.223}
+{"ts": 1791663843.832, "event": "probe", "phase": "after_delete", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 1605, "at": 1791663842.223}
+{"ts": 1791663857.105, "event": "probe", "phase": "after_delete", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 3260, "at": 1791663853.837}
+{"ts": 1791663870.807, "event": "probe", "phase": "after_delete", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 3691, "at": 1791663867.112}
+{"ts": 1791663884.574, "event": "probe", "phase": "after_delete", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 3759, "at": 1791663880.812}
+{"ts": 1791663898.34, "event": "probe", "phase": "after_delete", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 3756, "at": 1791663894.581}
+{"ts": 1791663911.702, "event": "probe", "phase": "after_delete", "verdict": "dead", "http_status": 400, "reason": "API_KEY_INVALID", "latency_ms": 3351, "at": 1791663908.345}
+{"ts": 1791663911.702, "event": "summary", "key_name": "projects/895320568859/locations/global/keys/0af7457b-0147-4d62-be0f-dbf2a5267843", "key_fingerprint": "sha256:3f8847d77151", "created_at": 1791663834.5336854, "alive_at": 1791663834.5336854, "lookup_matched": true, "deleted_at": 1791663842.2228055, "first_dead_at": 1791663842.2228055, "stable_dead_at": 1791663908.3449094, "reached": true, "flaps": 0, "probes_after_delete": 6, "seconds_to_first_dead": 0.0, "seconds_to_stable_dead": 66.1}

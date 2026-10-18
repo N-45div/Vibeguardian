@@ -1,0 +1,17 @@
+# What VibeGuardian may do without a person.
+#
+# CI always reads this file from the default branch, never from the pushed
+# commit, so a push cannot loosen the policy that judges it.
+
+[retire]
+auto = true
+# Retiring a key that more services use than this waits for a person.
+max_services = 3
+# Services that always wait for a person (globs on the full Cloud Run name).
+protected = []
+
+[replacement]
+# A leaked key that works on every API is replaced by one limited to the
+# APIs it called in the last used_days days.
+limit_to_used_apis = true
+used_days = 30

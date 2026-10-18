@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'">
+  <title>VibeGuardian</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <img src="../assets/app.png" alt="" class="logo">
+    <div>
+      <h1>VibeGuardian</h1>
+      <p id="status">Watching your clipboard for Google API keys.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button id="tab-clipboard" class="tab active" role="tab" aria-selected="true">Clipboard</button>
+    <button id="tab-keys" class="tab" role="tab" aria-selected="false">Your keys</button>
+  </nav>
+
+  <main id="pane-clipboard">
+    <section id="empty" class="card quiet">
+      <p>Copy a Google API key anywhere and I will tell you if it is live, how old it is, and what it can reach.</p>
+      <p class="small">Nothing leaves this computer except a check with Google.</p>
+    </section>
+
+    <section id="keycard" class="card" hidden>
+      <div class="row">
+        <code id="masked"></code>
+        <span id="verdict" class="pill"></span>
+      </div>
+      <p id="fp" class="small mono"></p>
+      <ul id="facts" class="facts"></ul>
+      <div class="actions">
+        <button id="retire" class="danger">Retire it now</button>
+        <button id="dismiss" class="ghost">Dismiss</button>
+      </div>
+      <p id="hint" class="small"></p>
+    </section>
+
+    <section id="progress" class="card" hidden>
+      <ol id="steps" class="steps"></ol>
+      <div id="stamp" class="stamp" hidden></div>
+    </section>
+
+    <p id="error" class="error" hidden></p>
+  </main>
+
+  <main id="pane-keys" hidden>
+    <div class="row">
+      <p id="keys-summary" class="summary">Every API key in your project.</p>
+      <button id="keys-refresh" class="ghost">Refresh</button>
+    </div>
+    <ul id="keylist" class="keylist"></ul>
+    <p class="small">Calls are Google's own counts for the last 7 days, by the region that served them.</p>
+  </main>
+
+  <footer>
+    <label class="field">Google Cloud project
+      <input id="project" placeholder="my-project-id" spellcheck="false">
+    </label>
+    <label class="toggle"><input type="checkbox" id="watching"> Watch my clipboard</label>
+    <label class="toggle"><input type="checkbox" id="login"> Start when I sign in</label>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

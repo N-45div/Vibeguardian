@@ -1,0 +1,73 @@
+{
+  "pipeline_id": "2959102108",
+  "commit": "7fe025d12c23df98955966a25ea59f1f6c168a17",
+  "leaks": [
+    {
+      "kind": "google_api_key",
+      "rule": "GCP API key",
+      "file": "demo/app/main.py",
+      "line": 31,
+      "commit": "7fe025d12c23df98955966a25ea59f1f6c168a17",
+      "fingerprint": "sha256:e0c339fad6a9"
+    }
+  ],
+  "responses": [
+    {
+      "leak": {
+        "kind": "google_api_key",
+        "rule": "GCP API key",
+        "file": "demo/app/main.py",
+        "line": 31,
+        "commit": "7fe025d12c23df98955966a25ea59f1f6c168a17",
+        "fingerprint": "sha256:e0c339fad6a9"
+      },
+      "incident": {
+        "leaked_fingerprint": "sha256:e0c339fad6a9",
+        "outcome": "needs_approval",
+        "old_key": "projects/895320568859/locations/global/keys/9670c917-0636-4e8c-b9c6-0b90989dd847",
+        "new_key": null,
+        "new_fingerprint": null,
+        "secrets": [
+          {
+            "secret": "projects/895320568859/secrets/gemini-api-key",
+            "old_version": "projects/895320568859/secrets/gemini-api-key/versions/12"
+          }
+        ],
+        "services": [],
+        "reason": "the policy protects projects/inbound-aspect-476820-e6/locations/us-central1/services/vg-demo",
+        "approved_by": null,
+        "replacement_restrictions": null,
+        "started_at": 1792270711.0472765,
+        "finished_at": 1792270711.869308,
+        "timeline": [
+          {
+            "event": "identified",
+            "at": 1792270711.157,
+            "key": "projects/895320568859/locations/global/keys/9670c917-0636-4e8c-b9c6-0b90989dd847"
+          },
+          {
+            "event": "consumers_found",
+            "at": 1792270711.869,
+            "secrets": [
+              "projects/895320568859/secrets/gemini-api-key"
+            ],
+            "services": [
+              "projects/inbound-aspect-476820-e6/locations/us-central1/services/vg-demo"
+            ]
+          },
+          {
+            "event": "approval_needed",
+            "at": 1792270711.869,
+            "reason": "the policy protects projects/inbound-aspect-476820-e6/locations/us-central1/services/vg-demo"
+          },
+          {
+            "event": "finished",
+            "at": 1792270711.869,
+            "outcome": "needs_approval",
+            "reason": "the policy protects projects/inbound-aspect-476820-e6/locations/us-central1/services/vg-demo"
+          }
+        ]
+      }
+    }
+  ]
+}

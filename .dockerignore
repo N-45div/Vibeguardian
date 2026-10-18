@@ -1,0 +1,7 @@
+# The vantage image needs only the package and its own service files.
+*
+!pyproject.toml
+!README.md
+!vibeguardian/
+!demo/vantage/
+**/__pycache__

@@ -1,0 +1,230 @@
+# VibeGuardian leak incident flow (GitLab Duo Agent Platform, flow registry v1).
+#
+# Trigger: a pipeline in this project fails.
+#
+# By the time this flow runs, the pipeline has already done the dangerous,
+# deterministic work without any AI: leak-respond retired the key and
+# leak-prove confirmed with Google that it is dead. This flow does the parts
+# that need judgement:
+#
+#   commander  decides whether the failure is a leak incident, reads the
+#              fingerprint-only evidence, and opens the incident issue.
+#   fixer      changes the code so it no longer holds a key, and opens the
+#              merge request ("Closes #N" shuts the incident when it merges).
+#              It works on a checkout where every key was already replaced
+#              by a placeholder before it started.
+#
+# A person merges the fix. GitLab attributes a flow's merge request to the
+# person who triggered it and does not let the flow merge it (segregation of
+# duties), so VibeGuardian leaves a green, ready merge request instead.
+version: "v1"
+environment: ambient
+
+components:
+  - name: commander
+    type: AgentComponent
+    prompt_id: commander_prompt
+    inputs:
+      - from: "context:project_id"
+        as: project_id
+      - from: "context:goal"
+        as: pipeline_event
+    toolset:
+      - get_pipeline_failing_jobs
+      - get_job_logs
+      - gitlab_api_get
+      - list_issues
+      - get_issue
+      - create_issue
+      - update_issue
+      - create_issue_note
+    ui_log_events:
+      - on_agent_final_answer
+      - on_tool_execution_success
+      - on_tool_execution_failed
+
+  - name: fixer
+    type: AgentComponent
+    prompt_id: fixer_prompt
+    inputs:
+      - from: "context:project_id"
+        as: project_id
+      - from: "context:goal"
+        as: pipeline_event
+    toolset:
+      - read_file
+      - read_files
+      - list_dir
+      - find_files
+      - grep
+      - edit_file
+      - list_issues
+      - get_issue
+      - list_issue_notes
+      - create_issue_note
+      - create_branch
+      - create_commit
+      - create_merge_request
+    ui_log_events:
+      - on_agent_final_answer
+      - on_tool_execution_success
+      - on_tool_execution_failed
+
+prompts:
+  - prompt_id: commander_prompt
+    name: VibeGuardian incident commander
+    unit_primitives: []
+    prompt_template:
+      system: |
+        You are VibeGuardian's incident commander inside GitLab. A pipeline in
+        this project failed. Decide whether it failed because VibeGuardian
+        found a leaked secret, and if so, write the incident up.
+
+        Hard rules:
+        - Never try to read, print, or reconstruct a secret value. Do not fetch
+          files from the repository at all. Work only from the pipeline event
+          and from VibeGuardian's job artifacts, which carry fingerprints
+          (sha256 plus 12 hex characters), never values.
+        - Report only what the artifacts show. Do not invent numbers.
+
+        Steps:
+        1. From the pipeline event, find the jobs named leak-gate,
+           leak-respond, leak-prove, leak-exposure, leak-approve,
+           leak-prove-approved and leak-gate-approved, with their ids and
+           statuses. If leak-gate-approved finished (success or failed), a
+           person approved a retirement the policy held back: use
+           leak-approve, leak-prove-approved and leak-gate-approved in place
+           of leak-respond, leak-prove and leak-gate from here on. If the
+           gate you use did not fail, answer exactly NOT_A_LEAK and stop.
+        2. Read the evidence with gitlab_api_get:
+           /projects/PROJECT_ID/jobs/RESPOND_JOB_ID/artifacts/incident.json
+           /projects/PROJECT_ID/jobs/PROVE_JOB_ID/artifacts/proof.json
+           /projects/PROJECT_ID/jobs/LEAK_EXPOSURE_JOB_ID/artifacts/exposure.json
+           (exposure.json may be missing if that job failed; then say so.)
+        3. Use list_issues with labels vibeguardian::incident to find an open
+           incident for the same fingerprint. If one exists, do not open a
+           duplicate. Instead: add a note with the new evidence, then use
+           update_issue to set its title and description to the new
+           write-up from step 4, so the issue itself always shows the latest
+           outcome. Earlier write-ups stay in the issue history and notes.
+        4. Otherwise create one issue per incident with create_issue:
+           Title: Leaked Google API key FINGERPRINT retired and proven dead
+           (if the outcome is not "retired" or the proof is not dead, say what
+           actually happened in the title instead).
+           Labels: vibeguardian::incident, security
+           Description in Markdown with these sections:
+           - Summary: what leaked, where (file:line), commit short SHA,
+             branch, and a link to the pipeline.
+           - Outcome: the retire outcome and reason. Old key and new key
+             resource names and fingerprints. If the incident has
+             approved_by, say who approved it and the policy's reason from
+             the "approved" timeline event. If it has
+             replacement_restrictions, say the replacement is limited to
+             those APIs, the ones the leaked key had actually called.
+           - Timeline: a table of the incident timeline events, with times
+             shown as seconds after the first event.
+           - Services: each service rolled, its new revision, and the health
+             check detail.
+           - Proof: how many times in a row Google rejected the old key, the
+             number of flaps, and seconds watched. If proof.json lists
+             "vantages", add a table with one row per vantage (the runner and
+             each Google region): its state, rejections, probes and flaps, and
+             name any "unreachable" vantages. Say plainly that the prover's
+             only identity can do nothing but call those vantage services.
+           - Who used it: from exposure.json, the exposure window, calls from
+             the key's own service regions, and calls from anywhere else by
+             region. Quote its summary. If "complete" is false, say the
+             counts are partial and when to check again.
+           - Still to do: the dead key is still in the code; a merge request
+             to remove it follows. History rewrite is not needed because
+             the key no longer works.
+           - Needs a human: any finding of an unsupported secret type. If
+             the outcome is "needs_approval", the title says the leak is held
+             for approval, and this section says plainly that the key STILL
+             WORKS, quotes the policy's reason, and says a person must run
+             the manual job leak-approve in this pipeline (link it) to
+             retire it; the approved proof and gate then follow.
+        5. Answer with exactly one word: LEAK
+      user: |
+        Project ID: {{project_id}}
+        Pipeline event:
+        {{pipeline_event}}
+    params:
+      timeout: 300
+
+  - prompt_id: fixer_prompt
+    name: VibeGuardian code fixer
+    unit_primitives: []
+    prompt_template:
+      system: |
+        You are VibeGuardian's code fixer. A leaked Google API key was found.
+        The pipeline already tried to retire it, and the open
+        vibeguardian::incident issue for its fingerprint says whether that
+        worked. Your job is to remove the key from the code properly, through
+        a merge request. Never claim the key is dead unless the incident
+        issue says Google rejected it.
+
+        Before you started, a setup script checked out the leaking branch and
+        replaced every Google API key with a placeholder of the form
+        VIBEGUARDIAN_REDACTED_ followed by 12 hex characters. It listed each
+        one in .vibeguardian/redactions.txt as "file:line sha256:hex", and
+        wrote the branch name to .vibeguardian/ref.txt. You never see key
+        values. Do not try to.
+
+        Steps:
+        1. Read .vibeguardian/redactions.txt and .vibeguardian/ref.txt. If the
+           list is empty, answer NOTHING_TO_FIX and stop.
+        2. For each listed file, read it and change the code so it holds no
+           key and no placeholder. The app must read its key from the
+           environment instead. For the demo app the variable GEMINI_API_KEY
+           is already filled from Secret Manager on Cloud Run, so a hardcoded
+           test or fallback key should simply be deleted along with any code
+           that only existed to use it. Keep the change as small as possible
+           and keep the code working.
+        3. Create the branch vibeguardian/remove-key-HEX8-SHA8 from the
+           branch in ref.txt, where HEX8 is the first 8 hex characters of the
+           fingerprint and SHA8 the first 8 characters of the pipeline's
+           commit (object_attributes.sha in the pipeline event). If that
+           branch already exists, never commit to it. Instead look for an
+           open merge request from that branch: if there is one, answer with
+           its URL (a re-run should finish the same fix, not start another);
+           if there is none, answer BRANCH_EXISTS.
+        4. Commit with create_commit, using update actions that contain the
+           full new content of each changed file. The content must not contain
+           "AIza" or "VIBEGUARDIAN_REDACTED". Message:
+           fix: remove leaked Google API key sha256:HEX from code
+        5. Open a merge request into the branch from ref.txt with
+           create_merge_request. Title: Remove leaked Google API key
+           sha256:HEX from code. Set remove_source_branch to true and labels
+           to vibeguardian::fix. In the description, link the open
+           vibeguardian::incident issue for this fingerprint (find it with
+           list_issues; read it with get_issue and its newest notes with
+           list_issue_notes), say what changed, and state the key's status
+           exactly as the incident's latest evidence reports it. Say that it
+           is ready for a person to merge once its pipeline passes (GitLab
+           does not let a flow merge its own change). End the description
+           with the line "Closes #IID" for that incident issue, so GitLab
+           closes the incident when the fix merges.
+           Only change files listed in redactions.txt.
+        6. Add a note to that incident issue with the merge request link.
+        7. Answer with the merge request URL.
+      user: |
+        Project ID: {{project_id}}
+        Pipeline event:
+        {{pipeline_event}}
+    params:
+      timeout: 300
+
+routers:
+  - from: commander
+    condition:
+      input: "context:commander.final_answer"
+      routes:
+        "LEAK": fixer
+        "NOT_A_LEAK": end
+        "default_route": end
+  - from: fixer
+    to: end
+
+flow:
+  entry_point: commander

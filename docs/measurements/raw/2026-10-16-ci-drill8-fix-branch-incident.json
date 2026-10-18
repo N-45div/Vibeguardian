@@ -1,0 +1,51 @@
+{
+  "pipeline_id": "2954779836",
+  "commit": "4a156872d97f667c23e81b7bf2c830b578ff9bc2",
+  "leaks": [
+    {
+      "kind": "google_api_key",
+      "rule": "GCP API key",
+      "file": "demo/app/main.py",
+      "line": 31,
+      "commit": "4575b0b5b8a6187da83764ab8bca3f0029231fd7",
+      "fingerprint": "sha256:030f2157953f"
+    }
+  ],
+  "responses": [
+    {
+      "leak": {
+        "kind": "google_api_key",
+        "rule": "GCP API key",
+        "file": "demo/app/main.py",
+        "line": 31,
+        "commit": "4575b0b5b8a6187da83764ab8bca3f0029231fd7",
+        "fingerprint": "sha256:030f2157953f"
+      },
+      "incident": {
+        "leaked_fingerprint": "sha256:030f2157953f",
+        "outcome": "already_deleted",
+        "old_key": "projects/895320568859/locations/global/keys/186f6233-f9fe-4841-afab-4800d380aa75",
+        "new_key": null,
+        "new_fingerprint": null,
+        "secrets": [],
+        "services": [],
+        "reason": "Google already deleted this key at 2026-10-16T10:48:32.776257Z",
+        "started_at": 1792148009.677432,
+        "finished_at": 1792148009.8711712,
+        "timeline": [
+          {
+            "event": "identified",
+            "at": 1792148009.783,
+            "key": "projects/895320568859/locations/global/keys/186f6233-f9fe-4841-afab-4800d380aa75"
+          },
+          {
+            "event": "finished",
+            "at": 1792148009.871,
+            "outcome": "already_deleted",
+            "reason": "Google already deleted this key at 2026-10-16T10:48:32.776257Z"
+          }
+        ]
+      }
+    }
+  ]
+}

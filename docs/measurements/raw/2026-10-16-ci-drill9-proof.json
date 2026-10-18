@@ -1,0 +1,80 @@
+{
+  "stable_required": 12,
+  "keys": {
+    "sha256:fa73db2a9b09": {
+      "dead": true,
+      "state": "proven_dead",
+      "accepted": 0,
+      "rejected": 60,
+      "watch": "full",
+      "probes": 60,
+      "flaps": 0,
+      "seconds_watched": 73.2,
+      "first_dead_at": 1792183257.9474113,
+      "stable_dead_at": 1792183329.6507335,
+      "unreachable": [],
+      "vantages": {
+        "runner": {
+          "dead": true,
+          "state": "proven_dead",
+          "accepted": 0,
+          "rejected": 12,
+          "watch": "full",
+          "probes": 12,
+          "flaps": 0,
+          "seconds_watched": 62.0,
+          "first_dead_at": 1792183257.9474113,
+          "stable_dead_at": 1792183319.820998
+        },
+        "europe-west1": {
+          "dead": true,
+          "state": "proven_dead",
+          "accepted": 0,
+          "rejected": 12,
+          "watch": "full",
+          "probes": 12,
+          "flaps": 0,
+          "seconds_watched": 62.8,
+          "first_dead_at": 1792183257.9478185,
+          "stable_dead_at": 1792183320.082998
+        },
+        "asia-northeast1": {
+          "dead": true,
+          "state": "proven_dead",
+          "accepted": 0,
+          "rejected": 12,
+          "watch": "full",
+          "probes": 12,
+          "flaps": 0,
+          "seconds_watched": 67.2,
+          "first_dead_at": 1792183257.9480457,
+          "stable_dead_at": 1792183324.8586025
+        },
+        "australia-southeast1": {
+          "dead": true,
+          "state": "proven_dead",
+          "accepted": 0,
+          "rejected": 12,
+          "watch": "full",
+          "probes": 12,
+          "flaps": 0,
+          "seconds_watched": 73.2,
+          "first_dead_at": 1792183257.9532454,
+          "stable_dead_at": 1792183329.6507335
+        },
+        "southamerica-east1": {
+          "dead": true,
+          "state": "proven_dead",
+          "accepted": 0,
+          "rejected": 12,
+          "watch": "full",
+          "probes": 12,
+          "flaps": 0,
+          "seconds_watched": 72.1,
+          "first_dead_at": 1792183257.9552374,
+          "stable_dead_at": 1792183329.020266
+        }
+      }
+    }
+  }
+}

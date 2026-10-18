@@ -1,0 +1,8 @@
+# Applies to every GitLab Duo flow that runs in this project.
+#
+# The setup script runs before any agent starts. It checks out the branch of
+# the pipeline that started the flow and replaces every Google API key in the
+# checkout with a fingerprint placeholder, so no agent ever reads a key value.
+# If it cannot do that, it fails and the flow does not start.
+setup_script:
+  - bash .gitlab/duo/redact-google-keys.sh

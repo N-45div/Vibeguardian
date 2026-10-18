@@ -1,0 +1,25 @@
+{
+  "reports": [
+    {
+      "fingerprint": "sha256:ebd854fa6ca5",
+      "window": {
+        "start": "2026-10-17T20:50:12Z",
+        "end": "2026-10-17T20:51:32.711000Z"
+      },
+      "expected_regions": [
+        "us-central1"
+      ],
+      "calls_from_your_services": 0,
+      "calls_from_elsewhere": 0,
+      "succeeded_from_elsewhere": 0,
+      "elsewhere_by_region": {},
+      "checks_from_elsewhere": 0,
+      "checks_by_region": {},
+      "likely_vibeguardian_probes": 0,
+      "by_region": {},
+      "complete": true,
+      "verdict": "no_use_elsewhere",
+      "summary": "No successful calls with this key came from outside the regions its services run in."
+    }
+  ]
+}

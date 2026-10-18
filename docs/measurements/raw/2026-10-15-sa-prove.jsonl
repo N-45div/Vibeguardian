@@ -1,0 +1,14 @@
+{"ts": 1792006622.628, "event": "canary", "minted": true}
+{"ts": 1792006622.966, "event": "probe", "target": "mint", "verdict": "alive", "http_status": null, "reason": null, "latency_ms": 338, "at": 1792006622.628}
+{"ts": 1792006624.769, "event": "probe", "target": "canary", "verdict": "alive", "http_status": 200, "reason": null, "latency_ms": 1802, "at": 1792006622.966}
+{"ts": 1792006635.11, "event": "probe", "target": "mint", "verdict": "alive", "http_status": null, "reason": null, "latency_ms": 339, "at": 1792006634.77}
+{"ts": 1792006636.976, "event": "probe", "target": "canary", "verdict": "alive", "http_status": 200, "reason": null, "latency_ms": 1865, "at": 1792006635.11}
+{"ts": 1792006647.327, "event": "probe", "target": "mint", "verdict": "alive", "http_status": null, "reason": null, "latency_ms": 336, "at": 1792006646.991}
+{"ts": 1792006649.076, "event": "probe", "target": "canary", "verdict": "alive", "http_status": 200, "reason": null, "latency_ms": 1747, "at": 1792006647.327}
+{"ts": 1792006659.4, "event": "probe", "target": "mint", "verdict": "dead", "http_status": null, "reason": "MINT_REFUSED", "latency_ms": 324, "at": 1792006659.076}
+{"ts": 1792006661.033, "event": "probe", "target": "canary", "verdict": "dead", "http_status": 401, "reason": "ACCESS_CUT", "latency_ms": 1631, "at": 1792006659.4}
+{"ts": 1792006671.385, "event": "probe", "target": "mint", "verdict": "dead", "http_status": null, "reason": "MINT_REFUSED", "latency_ms": 351, "at": 1792006671.033}
+{"ts": 1792006672.991, "event": "probe", "target": "canary", "verdict": "dead", "http_status": 401, "reason": "ACCESS_CUT", "latency_ms": 1605, "at": 1792006671.385}
+{"ts": 1792006683.378, "event": "probe", "target": "mint", "verdict": "dead", "http_status": null, "reason": "MINT_REFUSED", "latency_ms": 385, "at": 1792006682.992}
+{"ts": 1792006685.02, "event": "probe", "target": "canary", "verdict": "dead", "http_status": 401, "reason": "ACCESS_CUT", "latency_ms": 1641, "at": 1792006683.378}
+{"ts": 1792006685.021, "event": "verdict", "dead": true, "canary_minted": true, "seconds_until_key_cannot_mint": 36.4, "seconds_until_canary_refused": 36.8, "probes": 12}

@@ -1,0 +1,10 @@
+# How long until a call made with an API key shows up in Cloud Monitoring.
+# Run finished 2026-10-15T18:55:59Z. Three read-only calls (model list) with
+# the demo app's key from the laptop, then the key's request_count polled
+# every 30 s. Captured output; the terminal kept it from the first "call 200".
+call 200
+call 200
+2 s after the calls: {}
+33 s after the calls: {}
+63 s after the calls: {'asia-southeast1': 3}
+VISIBLE after 63 s

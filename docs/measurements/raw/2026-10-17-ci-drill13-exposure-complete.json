@@ -1,0 +1,36 @@
+{
+  "reports": [
+    {
+      "fingerprint": "sha256:3d516f175d0b",
+      "window": {
+        "start": "2026-10-17T21:48:16Z",
+        "end": "2026-10-17T21:49:35.928000Z"
+      },
+      "expected_regions": [
+        "us-central1"
+      ],
+      "calls_from_your_services": 0,
+      "calls_from_elsewhere": 5,
+      "succeeded_from_elsewhere": 0,
+      "elsewhere_by_region": {
+        "asia-southeast1": 5
+      },
+      "checks_from_elsewhere": 0,
+      "checks_by_region": {},
+      "likely_vibeguardian_probes": 0,
+      "by_region": {
+        "asia-southeast1": {
+          "ok": 0,
+          "error": 5,
+          "used_ok": 0,
+          "used_failed": 5,
+          "checks": 0,
+          "probe_like": 0
+        }
+      },
+      "complete": true,
+      "verdict": "used_elsewhere",
+      "summary": "5 call(s) that used this key came from asia-southeast1, where none of its services run (0 succeeded; Google refused the rest, but only someone holding the key could make them)."
+    }
+  ]
+}

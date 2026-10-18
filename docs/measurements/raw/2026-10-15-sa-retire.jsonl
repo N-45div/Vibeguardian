@@ -1,0 +1,9 @@
+{"ts": 1792006633.713, "event": "identified", "at": 1792006633.713, "account": "vg-leaky-app@inbound-aspect-476820-e6.iam.gserviceaccount.com", "key_id": "d219eae498c85f2bdfb9ae82e31df5a55c82bb64"}
+{"ts": 1792006637.304, "event": "consumers_found", "at": 1792006637.304, "secrets": ["projects/895320568859/secrets/leaky-sa-key"], "services": [], "runtime_identity_of": []}
+{"ts": 1792006642.67, "event": "replacement_account_created", "at": 1792006642.67, "account": "vg-leaky-app-r9e82@inbound-aspect-476820-e6.iam.gserviceaccount.com", "roles": ["roles/browser"]}
+{"ts": 1792006655.559, "event": "replacement_key_live", "at": 1792006655.559, "key": "projects/inbound-aspect-476820-e6/serviceAccounts/vg-leaky-app-r9e82@inbound-aspect-476820-e6.iam.gserviceaccount.com/keys/74b1bf15fd6971ca08ae511b7c4d5610d239274e"}
+{"ts": 1792006658.426, "event": "secret_version_added", "at": 1792006658.426, "secret": "projects/895320568859/secrets/leaky-sa-key", "version": "projects/895320568859/secrets/leaky-sa-key/versions/2"}
+{"ts": 1792006658.799, "event": "old_key_disabled", "at": 1792006658.799, "key": "projects/-/serviceAccounts/vg-leaky-app@inbound-aspect-476820-e6.iam.gserviceaccount.com/keys/d219eae498c85f2bdfb9ae82e31df5a55c82bb64"}
+{"ts": 1792006660.202, "event": "old_version_disabled", "at": 1792006660.202, "version": "projects/895320568859/secrets/leaky-sa-key/versions/1"}
+{"ts": 1792006660.622, "event": "old_account_disabled", "at": 1792006660.622, "account": "vg-leaky-app@inbound-aspect-476820-e6.iam.gserviceaccount.com"}
+{"ts": 1792006660.622, "event": "finished", "at": 1792006660.622, "outcome": "retired", "reason": null}

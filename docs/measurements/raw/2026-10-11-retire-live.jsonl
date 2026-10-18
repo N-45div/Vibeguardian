@@ -1,0 +1,9 @@
+{"ts": 1791665115.182, "event": "identified", "at": 1791665115.182, "key": "projects/895320568859/locations/global/keys/9749a1b9-5698-4b2b-ae53-6c891bff9556"}
+{"ts": 1791665123.814, "event": "consumers_found", "at": 1791665123.814, "secrets": ["projects/895320568859/secrets/gemini-api-key"], "services": ["projects/inbound-aspect-476820-e6/locations/us-central1/services/vg-demo"]}
+{"ts": 1791665130.094, "event": "replacement_created", "at": 1791665130.094, "key": "projects/895320568859/locations/global/keys/dac406eb-19e7-4437-9d71-7a7237dbcfc2", "fingerprint": "sha256:aae006dfde32"}
+{"ts": 1791665141.996, "event": "replacement_live", "at": 1791665141.996}
+{"ts": 1791665146.078, "event": "secret_version_added", "at": 1791665146.078, "secret": "projects/895320568859/secrets/gemini-api-key", "version": "projects/895320568859/secrets/gemini-api-key/versions/2"}
+{"ts": 1791665163.047, "event": "service_rolled", "at": 1791665163.046, "service": "projects/inbound-aspect-476820-e6/locations/us-central1/services/vg-demo", "healthy": true, "detail": "/health 200 on sha256:aae006dfde32"}
+{"ts": 1791665165.928, "event": "old_key_deleted", "at": 1791665165.928, "key": "projects/895320568859/locations/global/keys/9749a1b9-5698-4b2b-ae53-6c891bff9556"}
+{"ts": 1791665167.46, "event": "old_version_disabled", "at": 1791665167.46, "version": "projects/895320568859/secrets/gemini-api-key/versions/1"}
+{"ts": 1791665167.46, "event": "finished", "at": 1791665167.46, "outcome": "retired", "reason": null}

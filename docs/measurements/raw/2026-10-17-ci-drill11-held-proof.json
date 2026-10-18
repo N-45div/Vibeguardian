@@ -1,0 +1,80 @@
+{
+  "stable_required": 12,
+  "keys": {
+    "sha256:e0c339fad6a9": {
+      "dead": false,
+      "state": "alive",
+      "accepted": 27,
+      "rejected": 0,
+      "watch": "short (responder reported a failure)",
+      "probes": 27,
+      "flaps": 0,
+      "seconds_watched": 27.7,
+      "first_dead_at": null,
+      "stable_dead_at": null,
+      "unreachable": [],
+      "vantages": {
+        "runner": {
+          "dead": false,
+          "state": "alive",
+          "accepted": 6,
+          "rejected": 0,
+          "watch": "short (responder reported a failure)",
+          "probes": 6,
+          "flaps": 0,
+          "seconds_watched": 26.1,
+          "first_dead_at": null,
+          "stable_dead_at": null
+        },
+        "europe-west1": {
+          "dead": false,
+          "state": "alive",
+          "accepted": 6,
+          "rejected": 0,
+          "watch": "short (responder reported a failure)",
+          "probes": 6,
+          "flaps": 0,
+          "seconds_watched": 27.5,
+          "first_dead_at": null,
+          "stable_dead_at": null
+        },
+        "asia-northeast1": {
+          "dead": false,
+          "state": "alive",
+          "accepted": 5,
+          "rejected": 0,
+          "watch": "short (responder reported a failure)",
+          "probes": 5,
+          "flaps": 0,
+          "seconds_watched": 26.4,
+          "first_dead_at": null,
+          "stable_dead_at": null
+        },
+        "australia-southeast1": {
+          "dead": false,
+          "state": "alive",
+          "accepted": 5,
+          "rejected": 0,
+          "watch": "short (responder reported a failure)",
+          "probes": 5,
+          "flaps": 0,
+          "seconds_watched": 27.7,
+          "first_dead_at": null,
+          "stable_dead_at": null
+        },
+        "southamerica-east1": {
+          "dead": false,
+          "state": "alive",
+          "accepted": 5,
+          "rejected": 0,
+          "watch": "short (responder reported a failure)",
+          "probes": 5,
+          "flaps": 0,
+          "seconds_watched": 25.5,
+          "first_dead_at": null,
+          "stable_dead_at": null
+        }
+      }
+    }
+  }
+}

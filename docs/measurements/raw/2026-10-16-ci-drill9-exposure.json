@@ -1,0 +1,21 @@
+{
+  "reports": [
+    {
+      "fingerprint": "sha256:fa73db2a9b09",
+      "window": {
+        "start": "2026-10-16T20:39:01Z",
+        "end": "2026-10-16T20:40:16.083000Z"
+      },
+      "expected_regions": [
+        "us-central1"
+      ],
+      "calls_from_your_services": 0,
+      "calls_from_elsewhere": 0,
+      "elsewhere_by_region": {},
+      "by_region": {},
+      "complete": false,
+      "verdict": "no_use_elsewhere",
+      "summary": "No successful calls with this key came from outside the regions its services run in. Google's counts can lag up to 30 minutes: check again after 2026-10-16T21:10:16.083000Z."
+    }
+  ]
+}

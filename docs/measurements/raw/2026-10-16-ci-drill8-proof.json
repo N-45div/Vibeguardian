@@ -1,0 +1,17 @@
+{
+  "stable_required": 12,
+  "keys": {
+    "sha256:030f2157953f": {
+      "dead": true,
+      "state": "proven_dead",
+      "accepted": 0,
+      "rejected": 12,
+      "watch": "full",
+      "probes": 12,
+      "flaps": 0,
+      "seconds_watched": 57.6,
+      "first_dead_at": 1792147753.2577848,
+      "stable_dead_at": 1792147810.6359022
+    }
+  }
+}
