@@ -31,7 +31,7 @@ every vantage point that answers, not when a script says "deleted".
 ## What happens when a key leaks
 
 ```mermaid
-flowchart LR
+flowchart TD
     push["git push with a key"] --> sd["GitLab secret detection"]
     sd --> respond["leak-respond<br/>(vg-retirer)<br/>replacement, roll out,<br/>health check, delete"]
     policy[".vibeguardian.toml<br/>from the default branch"] -.-> respond
