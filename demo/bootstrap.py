@@ -3,7 +3,10 @@
 Creates an API key restricted to the Gemini API and stores it as the first
 version of a Secret Manager secret. Run once per demo project:
 
-    python demo/bootstrap.py --project <project-id>
+    python demo/bootstrap.py --project <project-id> [--bound-to <service-account-email>]
+
+With --bound-to it is an authorization key ("AQ."), the kind Google AI Studio
+issues, bound to that service account. Give that account no IAM roles.
 
 Then deploy with demo/deploy.sh.
 """
@@ -23,11 +26,12 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project", required=True)
     parser.add_argument("--secret-id", default="gemini-api-key")
+    parser.add_argument("--bound-to", help="service account to bind the key to (an AQ. authorization key)")
     args = parser.parse_args()
 
     http = session(quota_project=args.project)
     keys, secrets = ApiKeys(http), SecretManager(http)
-    key = keys.create(args.project, "vg-demo-app Gemini key", GEMINI_ONLY)
+    key = keys.create(args.project, "vg-demo-app Gemini key", GEMINI_ONLY, service_account=args.bound_to)
     value = keys.key_string(key["name"])
     try:
         secret = secrets.create_secret(args.project, args.secret_id)

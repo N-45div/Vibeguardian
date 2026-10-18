@@ -27,7 +27,7 @@ import requests
 from flask import Flask, jsonify, request
 
 GEMINI = "https://generativelanguage.googleapis.com/v1beta"
-MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash-lite")
+MODEL = os.environ.get("GEMINI_MODEL", "gemini-4-argon")
 MAX_QUESTION = 400
 MIN_SECONDS_BETWEEN_ASKS = 5.0
 
