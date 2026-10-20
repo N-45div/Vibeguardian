@@ -62,6 +62,23 @@ a different identity, and the only verdict it accepts is Google's.
 
 ## What each step does
 
+- **Before the commit, optionally.** A pre-commit hook stops a commit that
+  adds a Google API key, naming it by file, line and fingerprint;
+  `--check` also asks Google whether it is live. Only the lines being
+  committed are read, so old code and unrelated names such as
+  `GOOGLE_APPLICATION_CREDENTIALS` do not trip it. `vg install-hook` adds it
+  to one repository, or with the pre-commit framework:
+
+  ```yaml
+  repos:
+    - repo: https://github.com/N-45div/Vibeguardian
+      rev: main
+      hooks:
+        - id: vibeguardian
+  ```
+
+  It cannot catch a key that leaks another way (a chat, a screenshot, a CI
+  log, a laptop), which is what the rest of VibeGuardian is for.
 - **Detect.** GitLab secret detection flags the key, in either format: the
   classic `AIza` + 35 characters, or an `AQ.` + 50 authorization key, which
   is what Google AI Studio issues now.
@@ -94,7 +111,7 @@ a different identity, and the only verdict it accepts is Google's.
 | Stage | In VibeGuardian | Where |
 |---|---|---|
 | Plan | every leak becomes an incident issue, updated as evidence arrives | Duo flow, `flows/leak-incident.yml` |
-| Create | the fixer opens a merge request that removes the key | Duo flow; `skills/` |
+| Create | a pre-commit hook stops keys before they are committed; the fixer opens a merge request that removes one that got through | `vg install-hook`, Duo flow, `skills/` |
 | Verify | unit tests, an identity check per CI identity, the gate | `.gitlab-ci.yml` |
 | Package | the vantage image is built in CI and pushed to GitLab's container registry | `vantage-image` |
 | Secure | secret detection, container scanning (the vantage image scans at 0 findings), redaction before the agent | `.gitlab-ci.yml`, `.gitlab/duo/` |

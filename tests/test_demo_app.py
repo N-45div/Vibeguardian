@@ -56,3 +56,14 @@ def test_index_never_shows_the_key(demo):
     page = demo.app.test_client().get("/").get_data(as_text=True)
     assert "demo-secret-key" not in page
     assert demo.fingerprint("demo-secret-key") in page
+
+
+def test_ask_answers_with_a_clean_error_when_gemini_is_too_slow(demo, monkeypatch):
+    def slow(*args, **kwargs):
+        assert kwargs["timeout"] == 60
+        raise demo.requests.ReadTimeout("read timed out")
+
+    monkeypatch.setattr(demo.requests, "request", slow)
+    response = demo.app.test_client().post("/ask", json={"question": "hello"})
+    assert response.status_code == 504
+    assert response.get_json() == {"error": "Gemini did not answer in time"}

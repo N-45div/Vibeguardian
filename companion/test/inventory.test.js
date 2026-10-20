@@ -32,3 +32,8 @@ test("an empty project still reads well", () => {
   assert.equal(keysView({ days: 7, keys: [key({ age_days: 1, calls: 1 })] }).keys[0].detail,
     "1 day old · 1 call in 7 days · from us-central1");
 });
+
+test("several regions read as a count, so the line stays short", () => {
+  const view = keysView({ days: 7, keys: [key({ regions: ["asia-southeast1", "us-central1", "us-east4"], calls: 20 })] });
+  assert.equal(view.keys[0].detail, "12 days old · 20 calls in 7 days · from 3 regions");
+});

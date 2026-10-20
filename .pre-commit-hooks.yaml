@@ -1,0 +1,7 @@
+- id: vibeguardian
+  name: VibeGuardian (stop Google API keys)
+  description: Stops a commit that adds a Google API key (AIza... or AQ.), naming it by fingerprint only.
+  entry: vg scan-staged
+  language: python
+  pass_filenames: false
+  stages: [pre-commit]

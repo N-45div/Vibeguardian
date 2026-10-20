@@ -7,64 +7,72 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <img src="../assets/app.png" alt="" class="logo">
-    <div>
-      <h1>VibeGuardian</h1>
-      <p id="status">Watching your clipboard for Google API keys.</p>
-    </div>
-  </header>
+  <div class="panel" id="panel">
+    <header>
+      <button id="tab-clipboard" class="icon" title="Back" aria-label="Back" hidden>
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <img src="../assets/app.png" alt="" class="logo" id="logo">
+      <span class="title" id="title">VibeGuardian</span>
+      <button id="tab-keys" class="icon" title="Your keys" aria-label="Your keys">
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="5" cy="8" r="2.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7.6 8H14M12 8v2.2M14 8v1.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+      <button id="tab-settings" class="icon" title="Settings" aria-label="Settings">
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M8 5.6a2.4 2.4 0 1 0 0 4.8 2.4 2.4 0 0 0 0-4.8Z" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </button>
+    </header>
 
-  <nav class="tabs" role="tablist">
-    <button id="tab-clipboard" class="tab active" role="tab" aria-selected="true">Clipboard</button>
-    <button id="tab-keys" class="tab" role="tab" aria-selected="false">Your keys</button>
-  </nav>
-
-  <main id="pane-clipboard">
-    <section id="empty" class="card quiet">
-      <p>Copy a Google API key anywhere and I will tell you if it is live, how old it is, and what it can reach.</p>
-      <p class="small">Nothing leaves this computer except a check with Google.</p>
-    </section>
-
-    <section id="keycard" class="card" hidden>
-      <div class="row">
-        <code id="masked"></code>
-        <span id="verdict" class="pill"></span>
+    <section id="view-home">
+      <div id="idle" class="idle">
+        <span class="dot" id="dot"></span>
+        <div>
+          <p id="status" class="status">Watching your clipboard</p>
+          <p class="hint" id="idle-hint">Copy a Google API key and I'll check it.</p>
+        </div>
       </div>
-      <p id="fp" class="small mono"></p>
-      <ul id="facts" class="facts"></ul>
-      <div class="actions">
-        <button id="retire" class="danger">Retire it now</button>
-        <button id="dismiss" class="ghost">Dismiss</button>
+
+      <div id="keycard" class="keycard" hidden>
+        <div class="row">
+          <code id="masked"></code>
+          <span id="verdict" class="pill"></span>
+        </div>
+        <div id="chips" class="chips"></div>
+        <div id="actions" class="actions">
+          <button id="retire" class="primary">Retire it</button>
+          <button id="dismiss" class="ghost">Dismiss</button>
+        </div>
+        <p id="hint" class="hint"></p>
       </div>
-      <p id="hint" class="small"></p>
+
+      <div id="progress" class="progress" hidden>
+        <div class="bar"><span id="bar"></span></div>
+        <p id="step" class="hint"></p>
+      </div>
+
+      <div id="stamp" class="stamp" hidden>
+        <strong id="stamp-big"></strong>
+        <span id="stamp-small"></span>
+      </div>
+
+      <p id="error" class="error" hidden></p>
     </section>
 
-    <section id="progress" class="card" hidden>
-      <ol id="steps" class="steps"></ol>
-      <div id="stamp" class="stamp" hidden></div>
-    </section>
-
-    <p id="error" class="error" hidden></p>
-  </main>
-
-  <main id="pane-keys" hidden>
-    <div class="row">
+    <section id="view-keys" hidden>
       <p id="keys-summary" class="summary">Every API key in your project.</p>
-      <button id="keys-refresh" class="ghost">Refresh</button>
-    </div>
-    <ul id="keylist" class="keylist"></ul>
-    <p class="small">Calls are Google's own counts for the last 7 days, by the region that served them.</p>
-  </main>
+      <ul id="keylist" class="keylist"></ul>
+      <p class="foot">Google's own counts for the last 7 days. <button id="keys-refresh" class="link">Refresh</button></p>
+    </section>
 
-  <footer>
-    <label class="field">Google Cloud project
-      <input id="project" placeholder="my-project-id" spellcheck="false">
-    </label>
-    <label class="toggle"><input type="checkbox" id="watching"> Watch my clipboard</label>
-    <label class="toggle"><input type="checkbox" id="login"> Start when I sign in</label>
-  </footer>
-
+    <section id="view-settings" hidden>
+      <label class="field">
+        <span>Google Cloud project</span>
+        <input id="project" placeholder="my-project-id" spellcheck="false">
+      </label>
+      <label class="switch"><span>Watch my clipboard</span><input type="checkbox" id="watching"></label>
+      <label class="switch"><span>Start when I sign in</span><input type="checkbox" id="login"></label>
+      <p class="foot">Nothing leaves this computer except checks with Google.</p>
+    </section>
+  </div>
   <script src="app.js"></script>
 </body>
 </html>

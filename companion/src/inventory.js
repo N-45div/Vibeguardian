@@ -32,7 +32,7 @@ function keysView(result) {
       detail: [
         k.age_days != null ? `${plural(k.age_days, "day")} old` : null,
         `${plural(k.calls, "call")} in ${days} days`,
-        k.regions.length ? `from ${k.regions.join(", ")}` : null,
+        k.regions.length === 1 ? `from ${k.regions[0]}` : k.regions.length ? `from ${k.regions.length} regions` : null,
       ].filter(Boolean).join(" · "),
       limits: k.restrictions.unrestricted
         ? "no limits"

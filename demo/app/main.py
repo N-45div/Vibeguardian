@@ -44,11 +44,11 @@ def fingerprint(secret: str) -> str:
     return "sha256:" + hashlib.sha256(secret.encode("utf-8")).hexdigest()[:12]
 
 
-def _gemini(method: str, path: str, **kwargs) -> requests.Response:
+def _gemini(method: str, path: str, timeout: float = 20, **kwargs) -> requests.Response:
     key = _key()
     started = time.time()
     response = requests.request(
-        method, f"{GEMINI}/{path}", headers={"x-goog-api-key": key}, timeout=20, **kwargs
+        method, f"{GEMINI}/{path}", headers={"x-goog-api-key": key}, timeout=timeout, **kwargs
     )
     print(
         json.dumps(
@@ -94,7 +94,11 @@ def ask():
         "contents": [{"parts": [{"text": question}]}],
         "generationConfig": {"maxOutputTokens": 120},
     }
-    response = _gemini("POST", f"models/{MODEL}:generateContent", json=body)
+    try:
+        # Thinking models can take a while; the worker's own limit is 90 s.
+        response = _gemini("POST", f"models/{MODEL}:generateContent", json=body, timeout=60)
+    except requests.RequestException:
+        return jsonify(error="Gemini did not answer in time"), 504
     if response.status_code != 200:
         return jsonify(error="Gemini refused the request", status=response.status_code), 502
     try:

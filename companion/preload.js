@@ -12,4 +12,5 @@ contextBridge.exposeInMainWorld("vg", {
   onState: (fn) => ipcRenderer.on("state", (_e, s) => fn(s)),
   onProgress: (fn) => ipcRenderer.on("progress", (_e, p) => fn(p)),
   onError: (fn) => ipcRenderer.on("error", (_e, m) => fn(m)),
+  resize: (height) => ipcRenderer.send("resize", height),
 });

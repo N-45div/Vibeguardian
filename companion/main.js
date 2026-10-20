@@ -12,6 +12,11 @@ const { runVg } = require("./src/vg");
 const { keysView } = require("./src/inventory");
 
 const POLL_MS = 800;
+// A small popover: the panel is 300 px wide inside a transparent window with
+// room for its shadow, and the window takes the panel's height.
+const WIDTH = 320;
+const MIN_HEIGHT = 90;
+const MAX_HEIGHT = 620;
 const FORGET_KEY_AFTER_MS = 10 * 60 * 1000;
 
 let tray = null;
@@ -142,7 +147,19 @@ async function retire() {
   send("progress", { step: "started", at: started });
   const retired = await runVg(
     ["retire", "--key-env", "VG_LEAKED", "--project", settings.project, "--out", path.join(app.getPath("temp"), "vg-retire.jsonl")],
-    { key, onEvent: (e) => send("progress", { step: e.event, detail: e, at: Date.now() }) },
+    {
+      key,
+      onEvent: (e) => {
+        send("progress", { step: e.event, detail: e, at: Date.now() });
+        // Development only: also snapshot the window mid-retirement.
+        if (process.env.VG_SNAPSHOT_MID && e.event === "service_rolled") {
+          setTimeout(async () => {
+            const image = await win.webContents.capturePage();
+            fs.writeFileSync(process.env.VG_SNAPSHOT_MID, image.toPNG());
+          }, 500);
+        }
+      },
+    },
   );
   const outcome = retired.last && retired.last.outcome;
   if (outcome !== "retired") {
@@ -176,27 +193,34 @@ async function retire() {
   return { ok: dead, seconds };
 }
 
-function showWindow() {
+// Next to the tray icon: above it when the taskbar is at the bottom.
+function placeNearTray() {
   const trayBounds = tray.getBounds();
   const { workArea } = screen.getDisplayNearestPoint({ x: trayBounds.x, y: trayBounds.y });
   const [w, h] = win.getSize();
-  const x = Math.min(Math.max(trayBounds.x + trayBounds.width / 2 - w / 2, workArea.x + 8), workArea.x + workArea.width - w - 8);
-  const y = trayBounds.y > workArea.y + workArea.height / 2 ? workArea.y + workArea.height - h - 8 : workArea.y + 8;
+  const x = Math.min(Math.max(trayBounds.x + trayBounds.width / 2 - w / 2, workArea.x), workArea.x + workArea.width - w);
+  const y = trayBounds.y > workArea.y + workArea.height / 2 ? workArea.y + workArea.height - h : workArea.y;
   win.setPosition(Math.round(x), Math.round(y));
+}
+
+function showWindow() {
+  placeNearTray();
   win.show();
   win.focus();
 }
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 360,
-    height: 540,
+    width: WIDTH,
+    height: 160,
     show: false,
     frame: false,
+    transparent: true,
+    hasShadow: false,
     resizable: false,
     skipTaskbar: true,
     alwaysOnTop: true,
-    backgroundColor: "#f7f5ef",
+    backgroundColor: "#00000000",
     webPreferences: { preload: path.join(__dirname, "preload.js"), contextIsolation: true, nodeIntegration: false },
   });
   win.loadFile(path.join(__dirname, "renderer", "index.html"));
@@ -205,6 +229,15 @@ function createWindow() {
   });
 }
 
+ipcMain.on("resize", (_e, height) => {
+  const h = Math.min(Math.max(Math.round(Number(height) || 0), MIN_HEIGHT), MAX_HEIGHT);
+  if (!win || win.isDestroyed() || win.getSize()[1] === h) return;
+  // Windows will not shrink a non-resizable window below its first size.
+  win.setResizable(true);
+  win.setSize(WIDTH, h);
+  win.setResizable(false);
+  if (win.isVisible() && !process.env.VG_SNAPSHOT) placeNearTray();
+});
 ipcMain.handle("get-state", () => publicState());
 ipcMain.handle("retire", () => retire());
 ipcMain.handle("list-keys", async () => {
@@ -238,6 +271,11 @@ ipcMain.handle("dismiss", () => {
 });
 
 if (!app.requestSingleInstanceLock()) app.quit();
+
+// Development only: render snapshots at a higher pixel density (VG_SNAPSHOT_SCALE=2).
+if (process.env.VG_SNAPSHOT && process.env.VG_SNAPSHOT_SCALE) {
+  app.commandLine.appendSwitch("force-device-scale-factor", process.env.VG_SNAPSHOT_SCALE);
+}
 
 app.whenReady().then(async () => {
   loadSettings();

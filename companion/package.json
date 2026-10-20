@@ -1,6 +1,6 @@
 {
   "name": "vibeguardian-companion",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Tray companion: notices when you copy a Google API key, tells you if it is live, and retires it with proof.",
   "license": "MIT",
   "main": "main.js",

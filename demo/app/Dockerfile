@@ -4,4 +4,4 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY main.py .
 ENV PYTHONUNBUFFERED=1
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 4 --timeout 30 main:app
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 4 --timeout 90 main:app
