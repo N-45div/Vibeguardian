@@ -4,10 +4,10 @@
 // The key value stays in this process. The window only ever gets the
 // fingerprint and a masked preview.
 
-const { app, BrowserWindow, Tray, Notification, clipboard, ipcMain, nativeImage, screen } = require("electron");
+const { app, BrowserWindow, Tray, Notification, clipboard, ipcMain, nativeImage, screen, shell } = require("electron");
 const fs = require("node:fs");
 const path = require("node:path");
-const { findGoogleKey, fingerprint, mask } = require("./src/keys");
+const { findGoogleKey, findOtherKey, OTHER_PROVIDERS, fingerprint, mask } = require("./src/keys");
 const { runVg } = require("./src/vg");
 const { keysView } = require("./src/inventory");
 
@@ -52,6 +52,7 @@ function publicState() {
     settings,
     key: current && {
       fp: current.fp, masked: current.masked, report: current.report, at: current.at, retired: current.retired || null,
+      other: current.other || null,
     },
     busy,
   };
@@ -131,9 +132,25 @@ async function pollClipboard() {
   lastText = text;
   const key = findGoogleKey(text);
   debug("clipboard changed", `${text.length} chars`, key ? `google key ${fingerprint(key)}` : "no google key");
-  if (!key) return;
+  if (!key) {
+    const other = findOtherKey(text);
+    if (other) showOtherKey(other);
+    return;
+  }
   if (current && current.fp === fingerprint(key) && current.report) return;
   checkKey(key);
+}
+
+// Another provider's key: VibeGuardian cannot check or retire it, so keep
+// nothing but its fingerprint and say where it is revoked.
+function showOtherKey({ provider, value }) {
+  const fp = fingerprint(value);
+  if (current && current.fp === fp) return;
+  current = { key: null, fp, masked: mask(value), report: null, at: Date.now(),
+              other: { name: provider.name, label: provider.label, revokeAt: provider.revokeAt } };
+  debug("other provider key", provider.name, fp);
+  setTray("alert", `an ${provider.label} is on your clipboard (${current.masked})`);
+  notify(`${provider.label} copied`, `${current.masked}: if it was ever shared, revoke it.`);
 }
 
 async function retire() {
@@ -240,6 +257,12 @@ ipcMain.on("resize", (_e, height) => {
 });
 ipcMain.handle("get-state", () => publicState());
 ipcMain.handle("retire", () => retire());
+// Opens a provider's own key page, and nothing else.
+ipcMain.handle("open-revoke", (_e, name) => {
+  const provider = OTHER_PROVIDERS.find((p) => p.name === name);
+  if (provider) shell.openExternal(provider.revokeAt);
+  return Boolean(provider);
+});
 ipcMain.handle("list-keys", async () => {
   if (!settings.project) return { error: "Set your Google Cloud project below to see its keys." };
   const { code, last, error } = await runVg(["keys", "--project", settings.project]);

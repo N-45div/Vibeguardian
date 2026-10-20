@@ -80,6 +80,17 @@ function render(state) {
   if (!key) return fit();
 
   $("masked").textContent = key.masked;
+  if (key.other) {
+    $("verdict").textContent = "KEY";
+    $("verdict").className = "pill checking";
+    $("chips").replaceChildren(chip(key.other.label));
+    $("actions").hidden = false;
+    $("retire").textContent = "Revoke it";
+    $("retire").disabled = false;
+    $("hint").textContent = "VibeGuardian retires Google keys. This one is revoked on its provider's site.";
+    return fit();
+  }
+  $("retire").textContent = "Retire it";
   const r = key.report;
   const verdict = $("verdict");
   if (!r) {
@@ -203,7 +214,13 @@ window.vg.onProgress((p) => {
   fit();
 });
 
+let lastState = null;
+window.vg.onState((state) => { lastState = state; });
 $("retire").addEventListener("click", async () => {
+  if (lastState && lastState.key && lastState.key.other) {
+    window.vg.openRevoke(lastState.key.other.name);
+    return;
+  }
   $("retire").disabled = true;
   const result = await window.vg.retire();
   if (!result.ok && result.reason) {
@@ -228,4 +245,7 @@ $("project").addEventListener("change", async (e) => {
 $("watching").addEventListener("change", async (e) => render(await window.vg.setWatching(e.target.checked)));
 $("login").addEventListener("change", async (e) => render(await window.vg.setOpenAtLogin(e.target.checked)));
 
-window.vg.getState().then(render);
+window.vg.getState().then((state) => {
+  lastState = state;
+  render(state);
+});

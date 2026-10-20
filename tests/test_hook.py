@@ -28,7 +28,7 @@ def test_only_lines_this_commit_adds_are_checked(repo):
     (repo / "old.py").write_text(f'OLD = "{CLASSIC}"\nNEW = 1\n')
     git(repo, "add", "app.py", "old.py")
     keys = staged_keys(str(repo))
-    assert [(k.file, k.line, k.kind) for k in keys] == [("app.py", 2, "authorization key")]
+    assert [(k.file, k.line, k.kind) for k in keys] == [("app.py", 2, "Google authorization key")]
 
 
 def test_unstaged_edits_do_not_count(repo):
@@ -72,3 +72,33 @@ def test_install_hook_will_not_replace_someone_elses_hook(repo):
     with pytest.raises(FileExistsError):
         install_hook(str(repo))
     assert install_hook(str(repo), force=True).read_text().startswith("#!/bin/sh")
+
+
+# Other providers' key shapes, built at runtime from gitleaks' patterns.
+OPENAI = "sk-proj-" + "a" * 74 + "T3BlbkFJ" + "b" * 74
+ANTHROPIC = "sk-ant-api03-" + "c" * 93 + "AA"
+HUGGINGFACE = "hf_" + "d" * 34
+PERPLEXITY = "pplx-" + "e" * 48
+
+
+def test_other_ai_providers_keys_are_stopped_with_where_to_revoke_them(repo):
+    (repo / "keys.env").write_text(f"OPENAI={OPENAI}\nANTHROPIC={ANTHROPIC}\nHF={HUGGINGFACE}\nPPLX={PERPLEXITY}\n")
+    git(repo, "add", "keys.env")
+    keys = staged_keys(str(repo))
+    assert [(k.line, k.kind) for k in keys] == [
+        (1, "OpenAI key"), (2, "Anthropic key"), (3, "Hugging Face token"), (4, "Perplexity key")]
+    text = report(keys)
+    assert "platform.openai.com/api-keys" in text and "console.anthropic.com/settings/keys" in text
+    assert "vg retire" not in text  # VibeGuardian retires only Google keys
+    assert not any(v in text for v in (OPENAI, ANTHROPIC, HUGGINGFACE, PERPLEXITY))
+
+
+def test_names_and_words_that_only_look_like_keys_are_left_alone(repo):
+    (repo / "notes.txt").write_text(
+        "export GOOGLE_APPLICATION_CREDENTIALS=creds.json\n"
+        "pip install sk-learn-preprocessing\n"
+        '<div class="md-toolbar-container">\n'
+        "hf_hub_download(repo_id)\n"
+        "Read the FAQ.\n")
+    git(repo, "add", "notes.txt")
+    assert staged_keys(str(repo)) == []

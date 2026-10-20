@@ -64,7 +64,9 @@ a different identity, and the only verdict it accepts is Google's.
 
 - **Before the commit, optionally.** A pre-commit hook stops a commit that
   adds a Google API key, naming it by file, line and fingerprint;
-  `--check` also asks Google whether it is live. Only the lines being
+  `--check` also asks Google whether it is live. It also stops OpenAI,
+  Anthropic, Hugging Face and Perplexity keys (gitleaks' exact patterns) and
+  says where each is revoked; VibeGuardian retires only Google keys. Only the lines being
   committed are read, so old code and unrelated names such as
   `GOOGLE_APPLICATION_CREDENTIALS` do not trip it. `vg install-hook` adds it
   to one repository, or with the pre-commit framework:

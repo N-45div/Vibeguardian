@@ -1,8 +1,9 @@
-"""Stop a Google API key before it is committed.
+"""Stop an API key before it is committed.
 
 ``vg scan-staged`` reads only the lines a commit adds (the staged diff) and
-finds Google API keys in both formats. Run as a git pre-commit hook it blocks
-the commit and names each key by file, line and fingerprint, never by value.
+finds Google API keys in both formats, plus keys from the AI providers in
+``vibeguardian.providers``. Run as a git pre-commit hook it blocks the commit
+and names each key by file, line and fingerprint, never by value.
 ``vg install-hook`` installs it for one repository; the repository's
 ``.pre-commit-hooks.yaml`` offers it to the pre-commit framework.
 """
@@ -16,6 +17,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from vibeguardian.leaks import GOOGLE_API_KEY
+from vibeguardian.providers import Provider, find_other_keys
 from vibeguardian.secret import fingerprint
 
 _HUNK = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@")
@@ -26,6 +28,7 @@ class StagedKey:
     file: str
     line: int
     value: str  # in memory only; never printed
+    provider: Provider | None = None  # None: a Google key, which VibeGuardian can retire
 
     @property
     def fingerprint(self) -> str:
@@ -33,11 +36,13 @@ class StagedKey:
 
     @property
     def kind(self) -> str:
-        return "authorization key" if self.value.startswith("AQ.") else "API key"
+        if self.provider:
+            return self.provider.label
+        return "Google authorization key" if self.value.startswith("AQ.") else "Google API key"
 
 
 def staged_keys(repo: str = ".") -> list[StagedKey]:
-    """Google API keys on lines the staged changes add, in file order."""
+    """API keys on lines the staged changes add, in the order they appear."""
     diff = subprocess.run(
         ["git", "-C", repo, "diff", "--cached", "--unified=0", "--no-color", "--no-ext-diff", "--diff-filter=ACMR"],
         capture_output=True, text=True, encoding="utf-8", errors="replace", check=True,
@@ -54,26 +59,30 @@ def staged_keys(repo: str = ".") -> list[StagedKey]:
         elif (hunk := _HUNK.match(row)) is not None:
             line, in_header = int(hunk.group(1)), False
         elif not in_header and row.startswith("+") and file is not None:
-            found.extend(StagedKey(file, line, m.group(0)) for m in GOOGLE_API_KEY.finditer(row[1:]))
+            text = row[1:]
+            hits = [(m.start(), StagedKey(file, line, m.group(0))) for m in GOOGLE_API_KEY.finditer(text)]
+            hits += [(m.start(), StagedKey(file, line, m.group(0), p)) for p, m in find_other_keys(text)]
+            found.extend(key for _, key in sorted(hits, key=lambda h: h[0]))
             line += 1
     return found
 
 
 def report(keys: list[StagedKey], verdicts: dict[str, str] | None = None) -> str:
-    lines = ["VibeGuardian: this commit adds a Google API key, so it was stopped. Nothing was committed."]
+    lines = ["VibeGuardian: this commit adds an API key, so it was stopped. Nothing was committed."]
     for k in keys:
         status = f"  {verdicts[k.fingerprint]}" if verdicts and k.fingerprint in verdicts else ""
         lines.append(f"  {k.file}:{k.line}  {k.kind}  {k.fingerprint}{status}")
-    lines += [
-        "Keep keys out of the code: read them from an environment variable or Secret Manager.",
-        "If this key was ever pushed or shared, retire it: vg retire --key-env <VAR> --project <project>",
-        "To commit anyway, for a value you know is not a real key: git commit --no-verify",
-    ]
+    lines.append("Keep keys out of the code: read them from an environment variable or a secret manager.")
+    if any(k.provider is None for k in keys):
+        lines.append("If a Google key was ever pushed or shared, retire it: vg retire --key-env <VAR> --project <project>")
+    for provider in sorted({k.provider for k in keys if k.provider}, key=lambda p: p.name):
+        lines.append(f"If the {provider.label} was ever pushed or shared, revoke it at {provider.revoke_at}")
+    lines.append("To commit anyway, for a value you know is not a real key: git commit --no-verify")
     return "\n".join(lines)
 
 
 HOOK = """#!/bin/sh
-# Installed by vg install-hook: stops commits that add a Google API key.
+# Installed by vg install-hook: stops commits that add an API key.
 exec "{python}" -m vibeguardian.cli scan-staged
 """
 

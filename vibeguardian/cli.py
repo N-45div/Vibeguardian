@@ -208,7 +208,7 @@ def cmd_scan_staged(args: argparse.Namespace) -> int:
     if args.check:
         verdicts = {}
         for k in keys:
-            if k.fingerprint not in verdicts:
+            if k.provider is None and k.fingerprint not in verdicts:  # only Google keys can be checked here
                 r = probe_mod.probe(k.value)
                 verdicts[k.fingerprint] = {"alive": "LIVE: Google accepts it", "dead": "dead: Google rejects it"}.get(
                     r.verdict.value, "unknown: Google did not say")
@@ -611,9 +611,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--service-account", help="runtime identity; defaults to vg-vantage, which has no roles")
     p.set_defaults(func=cmd_deploy_vantage)
 
-    p = sub.add_parser("scan-staged", help="stop a commit that adds a Google API key (a pre-commit hook)")
+    p = sub.add_parser("scan-staged", help="stop a commit that adds an API key (a pre-commit hook)")
     p.add_argument("--repo", default=".")
-    p.add_argument("--check", action="store_true", help="also ask Google whether each key is live")
+    p.add_argument("--check", action="store_true", help="also ask Google whether each Google key is live")
     p.set_defaults(func=cmd_scan_staged)
 
     p = sub.add_parser("install-hook", help="install vg scan-staged as this repository's pre-commit hook")

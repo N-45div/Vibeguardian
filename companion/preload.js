@@ -4,6 +4,7 @@ const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("vg", {
   getState: () => ipcRenderer.invoke("get-state"),
   retire: () => ipcRenderer.invoke("retire"),
+  openRevoke: (provider) => ipcRenderer.invoke("open-revoke", provider),
   listKeys: () => ipcRenderer.invoke("list-keys"),
   dismiss: () => ipcRenderer.invoke("dismiss"),
   setProject: (project) => ipcRenderer.invoke("set-project", project),

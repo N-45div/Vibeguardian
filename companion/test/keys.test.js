@@ -37,3 +37,15 @@ test("finds authorization keys too, and not FAQ. text", () => {
   assert.strictEqual(findGoogleKey("F" + authKey), null);
   assert.strictEqual(findGoogleKey(authKey + "c"), null);
 });
+
+test("spots other AI providers' keys, and not words that only look like them", () => {
+  const { findOtherKey } = require("../src/keys");
+  const openai = "sk-proj-" + "a".repeat(74) + "T3BlbkFJ" + "b".repeat(74);
+  const anthropic = "sk-ant-api03-" + "c".repeat(93) + "AA";
+  assert.strictEqual(findOtherKey(`OPENAI_API_KEY=${openai}`).provider.name, "openai");
+  assert.strictEqual(findOtherKey(anthropic).value, anthropic);
+  assert.strictEqual(findOtherKey("hf_" + "d".repeat(34)).provider.label, "Hugging Face token");
+  for (const text of ["pip install sk-learn-preprocessing", "hf_hub_download(repo_id)", "md-toolbar-container"]) {
+    assert.strictEqual(findOtherKey(text), null);
+  }
+});
