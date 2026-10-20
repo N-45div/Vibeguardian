@@ -58,6 +58,7 @@ default:
 
 unit-tests:
   stage: test
+  image: python:3.12  # has git, for the pre-commit hook tests
   script:
     - pip install -q -e ".[test]"
     - pytest -q --junitxml=report.xml
