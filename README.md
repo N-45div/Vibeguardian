@@ -9,7 +9,9 @@ A GitLab Duo flow writes up the incident and opens the fix merge request; a
 person merges it.
 
 Every number below was measured on real keys and is backed by a raw log in
-[docs/measurements](docs/measurements/README.md).
+[docs/measurements](docs/measurements/README.md). The project page, with the
+drills drawn probe by probe, is at
+[vibeguardian-895320568859.us-central1.run.app](https://vibeguardian-895320568859.us-central1.run.app).
 
 | What | Measured |
 |---|---|

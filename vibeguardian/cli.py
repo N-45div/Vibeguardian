@@ -223,7 +223,7 @@ def cmd_install_hook(args: argparse.Namespace) -> int:
         path = install_hook(args.repo, force=args.force)
     except FileExistsError as err:
         sys.exit(str(err))
-    print(f"installed {path}: commits that add a Google API key will be stopped")
+    print(f"installed {path}: commits that add an API key will be stopped")
     return 0
 
 
