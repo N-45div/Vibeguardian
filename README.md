@@ -129,6 +129,12 @@ a different identity, and the only verdict it accepts is Google's.
 Each of these is a real run, with its raw records in
 [docs/measurements](docs/measurements/README.md).
 
+- **The run in the demo video.** Drill 15: leaked key deleted 77.9 s after
+  the push, proven dead from five places at 193.9 s, 542 of 542 app requests
+  OK, and an outsider's calls flagged from Google's counts.
+  [Pipeline 2970531482](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/34816704/vibeguardian/-/pipelines/2970531482),
+  [incident #12](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/34816704/vibeguardian/-/issues/12),
+  [fix MR !12](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/34816704/vibeguardian/-/merge_requests/12).
 - **The approval gate.** Drill 11 held a retirement for approval, the
   prover reported the key still alive, a person approved, and the approved
   proof then caught Europe answering a deleted key.

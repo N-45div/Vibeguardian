@@ -1,0 +1,44 @@
+{
+  "reports": [
+    {
+      "fingerprint": "sha256:4196acae4d54",
+      "window": {
+        "start": "2026-10-21T06:00:15Z",
+        "end": "2026-10-21T06:01:37.392000Z"
+      },
+      "expected_regions": [
+        "us-central1"
+      ],
+      "calls_from_your_services": 20,
+      "calls_from_elsewhere": 3,
+      "succeeded_from_elsewhere": 3,
+      "elsewhere_by_region": {
+        "asia-southeast1": 3
+      },
+      "checks_from_elsewhere": 0,
+      "checks_by_region": {},
+      "likely_vibeguardian_probes": 0,
+      "by_region": {
+        "asia-southeast1": {
+          "ok": 3,
+          "error": 0,
+          "used_ok": 3,
+          "used_failed": 0,
+          "checks": 0,
+          "probe_like": 0
+        },
+        "us-central1": {
+          "ok": 20,
+          "error": 0,
+          "used_ok": 0,
+          "used_failed": 0,
+          "checks": 20,
+          "probe_like": 0
+        }
+      },
+      "complete": false,
+      "verdict": "used_elsewhere",
+      "summary": "3 call(s) that used this key came from asia-southeast1, where none of its services run (3 succeeded; Google refused the rest, but only someone holding the key could make them). Google's counts can lag up to 30 minutes: check again after 2026-10-21T06:31:37.392000Z."
+    }
+  ]
+}

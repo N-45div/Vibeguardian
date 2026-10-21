@@ -360,6 +360,40 @@ Raw: [first run](raw/2026-10-18-ci-drill14-incident-first.json),
 [the racing run](raw/2026-10-18-ci-drill14-incident-fix-b-race.json),
 [proof](raw/2026-10-18-ci-drill14-proof.json), [probe log](raw/2026-10-18-ci-drill14-prove.jsonl).
 
+## Drill 15: the run in the demo video
+
+On 2026-10-21 the automatic path was run once more and recorded on screen
+(branch `drill-15-film`, pipeline 2970531482, key `sha256:4196acae4d54`, an
+`AQ.` key). The demo app's `/health` was called about once every 1.7 s
+throughout, and the laptop played an outsider: right after the push it used
+the leaked key 5 times to generate content (all 5 answered 200). Times are
+seconds after GitLab created the push pipeline.
+
+| Step | Result |
+|---|---|
+| Responder | started 17.6 s; replacement live 11.9 s into its run, Cloud Run healthy on the new key at 26.9 s, old key deleted at 29.3 s |
+| Leaked key deleted | **77.9 s** after the push |
+| Proven dead | **193.9 s**, 60 of 60 refusals from five places, 0 flaps, 75.6 s watched |
+| Pipeline finished (gate red) | 236.2 s |
+| Incident #12 opened by the Duo flow | 297.6 s |
+| Fix MR !12 opened | 341.4 s |
+| Users | **542 requests, 542 OK**; the app served the replacement from 06:01:32 UTC, 5 s before the old key was deleted at 06:01:37 |
+
+Who used it: the CI report (partial, as it said) found 3 successful calls from
+asia-southeast1 and gave `used_elsewhere`. The complete counts, read after the
+30-minute delay, still show 3, also with the window widened to start a minute
+before the push. The outsider's own log shows 5 calls, so 2 never appeared in
+Google's per-key counts: treat those counts as a lower bound. Raw:
+[incident](raw/2026-10-21-ci-drill15-incident.json),
+[respond log](raw/2026-10-21-ci-drill15-respond.jsonl),
+[proof](raw/2026-10-21-ci-drill15-proof.json),
+[prove log](raw/2026-10-21-ci-drill15-prove.jsonl),
+[exposure in CI](raw/2026-10-21-ci-drill15-exposure.json),
+[exposure complete](raw/2026-10-21-ci-drill15-exposure-complete.json),
+[outsider](raw/2026-10-21-ci-drill15-outsider.log),
+[load](raw/2026-10-21-ci-drill15-load.log),
+[timings](raw/2026-10-21-ci-drill15-timings.json).
+
 ## Retiring a leaked service-account key
 
 How: `demo/bootstrap_sa.py` creates a throwaway account (`vg-leaky-app`, read-only

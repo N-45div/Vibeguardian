@@ -1,0 +1,80 @@
+{
+  "stable_required": 12,
+  "keys": {
+    "sha256:4196acae4d54": {
+      "dead": true,
+      "state": "proven_dead",
+      "accepted": 0,
+      "rejected": 60,
+      "watch": "full",
+      "probes": 60,
+      "flaps": 0,
+      "seconds_watched": 75.6,
+      "first_dead_at": 1792562539.4962406,
+      "stable_dead_at": 1792562613.344481,
+      "unreachable": [],
+      "vantages": {
+        "runner": {
+          "dead": true,
+          "state": "proven_dead",
+          "accepted": 0,
+          "rejected": 12,
+          "watch": "full",
+          "probes": 12,
+          "flaps": 0,
+          "seconds_watched": 56.1,
+          "first_dead_at": 1792562539.4962406,
+          "stable_dead_at": 1792562595.5247202
+        },
+        "europe-west1": {
+          "dead": true,
+          "state": "proven_dead",
+          "accepted": 0,
+          "rejected": 12,
+          "watch": "full",
+          "probes": 12,
+          "flaps": 0,
+          "seconds_watched": 61.8,
+          "first_dead_at": 1792562539.4966936,
+          "stable_dead_at": 1792562600.5765212
+        },
+        "asia-northeast1": {
+          "dead": true,
+          "state": "proven_dead",
+          "accepted": 0,
+          "rejected": 12,
+          "watch": "full",
+          "probes": 12,
+          "flaps": 0,
+          "seconds_watched": 71.1,
+          "first_dead_at": 1792562539.497134,
+          "stable_dead_at": 1792562610.3352244
+        },
+        "australia-southeast1": {
+          "dead": true,
+          "state": "proven_dead",
+          "accepted": 0,
+          "rejected": 12,
+          "watch": "full",
+          "probes": 12,
+          "flaps": 0,
+          "seconds_watched": 75.6,
+          "first_dead_at": 1792562539.4976993,
+          "stable_dead_at": 1792562613.344481
+        },
+        "southamerica-east1": {
+          "dead": true,
+          "state": "proven_dead",
+          "accepted": 0,
+          "rejected": 12,
+          "watch": "full",
+          "probes": 12,
+          "flaps": 0,
+          "seconds_watched": 69.1,
+          "first_dead_at": 1792562539.5001905,
+          "stable_dead_at": 1792562607.658315
+        }
+      }
+    }
+  }
+}
