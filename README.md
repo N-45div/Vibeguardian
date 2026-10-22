@@ -13,6 +13,12 @@ Every number below was measured on real keys and is backed by a raw log in
 drills drawn probe by probe, is at
 [vibeguardian-895320568859.us-central1.run.app](https://vibeguardian-895320568859.us-central1.run.app).
 
+**Watch it yourself:** the [live drill](https://vg-live-895320568859.us-central1.run.app)
+makes a throwaway Gemini key, gets Gemini 4 Argon to answer with it, deletes it, and
+asks again from Iowa, Belgium, Tokyo, Sydney and São Paulo until every place refuses it
+12 rounds in a row, with Gemini's own answer as the judge. Every drill keeps its own
+link and is counted on the page.
+
 | What | Measured |
 |---|---|
 | Leaked Gemini key retired, after the push | 76 s (drill 10), with the app healthy on the replacement throughout |
@@ -129,6 +135,9 @@ a different identity, and the only verdict it accepts is Google's.
 Each of these is a real run, with its raw records in
 [docs/measurements](docs/measurements/README.md).
 
+- **A live drill, now.** [Run one](https://vg-live-895320568859.us-central1.run.app):
+  about three minutes on a fresh key, with a permanent link to its proof.
+  The service is `demo/live/`; its engine is `vibeguardian/drill.py`.
 - **The run in the demo video.** Drill 15: leaked key deleted 77.9 s after
   the push, proven dead from five places at 193.9 s, 542 of 542 app requests
   OK, and an outsider's calls flagged from Google's counts.
@@ -233,7 +242,7 @@ Then push a commit with the demo app's key in it, and watch.
 | `flows/leak-incident.yml` | the Duo flow (commander and fixer) |
 | `.gitlab/duo/` | redaction that runs before the agent |
 | `skills/` | the leak-response skill for coding agents |
-| `demo/` | the demo app, the vantage service, and setup scripts |
+| `demo/` | the demo app, the vantage service, the public live drill (`demo/live/`), and setup scripts |
 | `companion/` | a Windows tray app that spots Google keys on the clipboard |
 | `docs/measurements/` | every measurement, with raw logs |
 

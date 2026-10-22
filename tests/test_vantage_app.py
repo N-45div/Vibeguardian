@@ -53,3 +53,30 @@ def test_anything_but_one_google_key_is_refused_without_calling_google(vantage, 
 def test_health(vantage):
     module, _ = vantage
     assert module.app.test_client().get("/health").get_json() == {"ok": True, "region": "europe-west1"}
+
+
+def test_round_lists_and_asks_gemini_and_never_returns_the_key(vantage, monkeypatch):
+    module, asked = vantage
+    from vibeguardian.probe import GeminiAnswer
+
+    gemini = []
+
+    def fake_ask(key):
+        gemini.append(key)
+        return GeminiAnswer(ProbeResult(Verdict.ALIVE, 200, None, 900, 1.0), "ALIVE")
+
+    monkeypatch.setattr(module, "ask_gemini", fake_ask)
+    response = module.app.test_client().post("/round", json={"key": KEY})
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["region"] == "europe-west1" and body["fingerprint"] == fingerprint(KEY)
+    assert body["list"]["verdict"] == "dead"
+    assert body["ask"]["verdict"] == "alive" and body["ask"]["answer"] == "ALIVE"
+    assert KEY not in response.get_data(as_text=True)
+    assert asked == [KEY] and gemini == [KEY]
+
+
+def test_round_refuses_anything_but_one_google_key(vantage):
+    module, asked = vantage
+    assert module.app.test_client().post("/round", json={"key": "nope"}).status_code == 400
+    assert asked == []

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VibeGuardian live drill</title>
+<meta name="description" content="Watch a real Gemini key get deleted and proven dead from five places, with Gemini 4 Argon as the judge.">
+<meta name="theme-color" content="#f3f3f3">
+<link rel="icon" type="image/png" href="/static/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/static/style.css">
+<script src="/static/app.js" defer></script>
+</head>
+<body>
+<header class="wrap nav">
+  <a class="brand" href="/"><img src="/static/logo.png" alt="" width="22" height="22">VibeGuardian <span class="tag">live drill</span></a>
+  <nav><a href="https://vibeguardian-895320568859.us-central1.run.app">How it works</a></nav>
+</header>
+
+<main class="wrap">
+  <section id="intro" class="intro">
+    <span class="chip"><i></i>Real Google, real keys, nothing simulated</span>
+    <h1>Delete a key. Watch Google judge it.</h1>
+    <p class="lede">Press the button and VibeGuardian makes a throwaway Gemini key, gets Gemini&nbsp;4&nbsp;Argon to answer with it, deletes it, then keeps asking from five places until every place refuses it 12 rounds in a row. The key never leaves the server; you see its fingerprint.</p>
+    <div class="actions">
+      <button id="start" class="btn" type="button">Run a live drill</button>
+      <span id="start-note" class="small muted">About 3 minutes · one drill at a time · every drill keeps its own link</span>
+    </div>
+  </section>
+
+  <section id="drill" class="drill" hidden>
+    <div class="frame">
+      <article class="glass card">
+        <div class="head">
+          <div>
+            <span class="label" id="drill-title">Drill</span>
+            <h2 id="drill-headline">Starting…</h2>
+            <p class="small muted mono" id="drill-fp"></p>
+          </div>
+          <span class="pill" id="drill-pill">RUNNING</span>
+        </div>
+        <ol class="steps" id="steps"></ol>
+        <div class="chart-wrap">
+          <div class="legend"><span><i></i>refused</span><span><i class="red"></i>a deleted key still worked</span><span><i class="grey"></i>no answer (timeout)</span></div>
+          <svg id="chart" viewBox="0 0 900 330" role="img" aria-label="Every round of the proof, per place"></svg>
+          <p class="tiny muted" id="chart-note">Seconds after the key was deleted. Each round asks Gemini 4 Argon one five-token question and lists models, at the same time.</p>
+        </div>
+        <div class="verdict" id="verdict" hidden></div>
+        <div class="share" id="share" hidden>
+          <span class="mono small" id="share-url"></span>
+          <button class="btn sm ghost" id="copy" type="button">Copy link</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="stats" class="stats-section">
+    <h2>Every drill so far</h2>
+    <p class="lede">Every drill run here is kept and counted, judges' runs included.</p>
+    <div class="stats" id="stats-grid"></div>
+    <ul class="recent" id="recent"></ul>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <span>VibeGuardian · open source, MIT</span>
+  <span class="muted">Keys named vg-live-*, restricted to the Gemini API, deleted at the end of every drill.</span>
+</footer>
+</body>
+</html>

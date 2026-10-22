@@ -1,6 +1,6 @@
 import requests
 
-from vibeguardian.probe import ProbeResult, Verdict, classify, probe, watch
+from vibeguardian.probe import ProbeResult, Verdict, ask_gemini, classify, probe, watch
 
 
 def google_error(status, reason=None, message="error"):
@@ -169,3 +169,43 @@ def test_a_401_with_another_message_is_not_proof_of_death():
     body = google_error(401, "ACCESS_TOKEN_TYPE_UNSUPPORTED",
                         "Request had invalid authentication credentials. Expected OAuth 2 access token.")
     assert classify(401, body)[0] == Verdict.UNKNOWN
+
+
+class FakePostSession:
+    def __init__(self, response=None, exc=None):
+        self.response = response
+        self.exc = exc
+        self.calls = []
+
+    def post(self, url, json=None, headers=None, timeout=None):
+        self.calls.append((url, json, headers))
+        if self.exc:
+            raise self.exc
+        return self.response
+
+
+def test_ask_gemini_keeps_the_key_out_of_the_url_and_returns_the_reply():
+    reply = {"candidates": [{"content": {"parts": [{"text": " ALIVE\n"}]}}]}
+    session = FakePostSession(FakeResponse(200, reply))
+    answer = ask_gemini("secret-key", session=session)
+    url, body, headers = session.calls[0]
+    assert "secret-key" not in url and url.endswith("/gemini-4-argon:generateContent")
+    assert headers == {"x-goog-api-key": "secret-key"}
+    assert body["generationConfig"] == {"maxOutputTokens": 5}
+    assert answer.result.verdict == Verdict.ALIVE and answer.answer == "ALIVE"
+
+
+def test_ask_gemini_with_a_deleted_key_is_dead_and_has_no_answer():
+    body = {"error": {"message": "API key not valid.", "details": [{"reason": "API_KEY_INVALID"}]}}
+    answer = ask_gemini("k", session=FakePostSession(FakeResponse(400, body)))
+    assert answer.result.verdict == Verdict.DEAD and answer.answer is None
+
+
+def test_ask_gemini_timeout_proves_nothing():
+    answer = ask_gemini("k", session=FakePostSession(exc=requests.ReadTimeout("slow")))
+    assert answer.result.verdict == Verdict.UNKNOWN and answer.result.reason == "NETWORK_ERROR"
+
+
+def test_ask_gemini_reply_is_cut_to_24_characters():
+    reply = {"candidates": [{"content": {"parts": [{"text": "A" * 100}]}}]}
+    assert len(ask_gemini("k", session=FakePostSession(FakeResponse(200, reply))).answer) == 24

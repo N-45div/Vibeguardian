@@ -129,7 +129,7 @@ container_scanning:
     CS_IMAGE: $VANTAGE_IMAGE
 
 # Deploys as vg-deployer. The service runs as vg-vantage, which has no roles,
-# and only vg-prover may call it.
+# and only vg-prover and the public live drill (vg-live) may call it.
 deploy-vantage:
   stage: release
   extends: [.google_identity, .vantage_release]
@@ -143,6 +143,7 @@ deploy-vantage:
     - vg deploy-vantage --project "$GCP_PROJECT_ID" --image "$VANTAGE_AR_IMAGE"
         $(for r in $VANTAGE_REGIONS; do printf -- '--region %s ' "$r"; done)
         --invoker "serviceAccount:vg-prover@$GCP_PROJECT_ID.iam.gserviceaccount.com"
+        --invoker "serviceAccount:vg-live@$GCP_PROJECT_ID.iam.gserviceaccount.com"
 
 leak-respond:
   stage: respond

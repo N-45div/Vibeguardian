@@ -126,6 +126,55 @@ def probe(
     return ProbeResult(verdict, response.status_code, reason, _ms_since(started), started)
 
 
+GEMINI_MODEL = "gemini-4-argon"
+GEMINI_PROMPT = "Reply with the single word ALIVE."
+
+
+@dataclass(frozen=True)
+class GeminiAnswer:
+    result: ProbeResult
+    answer: str | None  # Gemini's reply when the key worked, at most 24 characters
+
+    def as_dict(self) -> dict[str, Any]:
+        return {**self.result.as_dict(), "answer": self.answer}
+
+
+def ask_gemini(
+    key: str,
+    model: str = GEMINI_MODEL,
+    *,
+    timeout: float = 20.0,
+    session: requests.Session | None = None,
+) -> GeminiAnswer:
+    """Ask Gemini one fixed five-token question with ``key``; Google's answer is the verdict.
+
+    The same classification as ``probe``: a reply means the key works, "API key
+    not valid" means it does not, and anything else (a timeout, a 5xx) proves
+    nothing either way.
+    """
+    http = session or requests
+    started = time.time()
+    body = {"contents": [{"parts": [{"text": GEMINI_PROMPT}]}], "generationConfig": {"maxOutputTokens": 5}}
+    try:
+        response = http.post(f"{DEFAULT_ENDPOINT}/{model}:generateContent", json=body,
+                             headers={"x-goog-api-key": key}, timeout=timeout)
+    except requests.RequestException:
+        return GeminiAnswer(ProbeResult(Verdict.UNKNOWN, None, "NETWORK_ERROR", _ms_since(started), started), None)
+    try:
+        payload = response.json()
+    except ValueError:
+        payload = None
+    verdict, reason = classify(response.status_code, payload)
+    answer = None
+    if response.status_code == 200 and isinstance(payload, dict):
+        try:
+            parts = payload["candidates"][0]["content"]["parts"]
+            answer = "".join(str(p.get("text", "")) for p in parts).strip()[:24] or None
+        except (KeyError, IndexError, TypeError):
+            answer = None
+    return GeminiAnswer(ProbeResult(verdict, response.status_code, reason, _ms_since(started), started), answer)
+
+
 @dataclass(frozen=True)
 class WatchResult:
     reached: bool
