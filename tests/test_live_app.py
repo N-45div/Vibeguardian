@@ -86,17 +86,22 @@ def test_save_writes_the_bucket_at_most_every_5s_while_running_and_always_at_the
 
 def test_stats_count_revivals_and_proofs(live):
     module, store, _ = live
-    store["listed"] = [{"name": "drills/a.json"}, {"name": "drills/b.json"}, {"name": "drills/c.json"}]
+    store["listed"] = [{"name": f"drills/{x}.json"} for x in "abcd"]
     store["objects"] = {
         "a": {"id": "a", "started_at": 3, "verdict": {"state": "proven_dead", "seconds": 60.0, "revivals": []}},
-        "b": {"id": "b", "started_at": 2, "verdict": {"state": "proven_dead", "seconds": 120.0,
-                                                       "revivals": [{"t": 41.5, "label": "Belgium"}]}},
+        "b": {"id": "b", "started_at": 2, "t_basis": "sent",
+              "verdict": {"state": "proven_dead", "seconds": 120.0,
+                          "revivals": [{"t": 41.5, "label": "Belgium", "how": "ask+list"}]}},
+        "d": {"id": "d", "started_at": 0, "verdict": {"state": "proven_dead", "seconds": 90.0,
+                                                       "revivals": [{"t": 77.0, "label": "Iowa", "how": "list"}]}},
         "c": {"id": "c", "started_at": 1, "verdict": {"state": "failed", "message": "x"}},
     }
     s = module.app.test_client().get("/api/stats").get_json()
-    assert s["drills"] == 2 and s["with_revival"] == 1 and s["latest_revival_s"] == 41.5
-    assert s["revivals_by_place"] == {"Belgium": 1} and s["median_proven_s"] == 120.0
-    assert [r["id"] for r in s["recent"]] == ["a", "b", "c"]
+    assert s["drills"] == 3 and s["with_revival"] == 2 and s["gemini_answered"] == 1
+    # only drills that time answers by when the call left count toward the latest time
+    assert s["latest_revival_s"] == 41.5
+    assert s["revivals_by_place"] == {"Belgium": 1, "Iowa": 1} and s["median_proven_s"] == 90.0
+    assert [r["id"] for r in s["recent"]] == ["a", "b", "c", "d"]
 
 
 def test_pages_carry_a_strict_csp(live):

@@ -177,8 +177,8 @@ async function loadStats() {
     const tiles = [
       [String(s.drills), "drills run"],
       [String(s.with_revival), "drills where a deleted key still worked somewhere"],
-      [s.latest_revival_s == null ? "—" : secs(s.latest_revival_s), "latest answer to a deleted key"],
-      [s.median_proven_s == null ? "—" : secs(s.median_proven_s), "median time to proven dead"],
+      [String(s.gemini_answered ?? 0), "drills where Gemini 4 Argon answered a deleted key"],
+      [s.latest_revival_s == null ? "—" : secs(s.latest_revival_s), "latest call a deleted key got answered (sent after deletion)"],
     ];
     $("stats-grid").replaceChildren(...tiles.map(([n, label]) => {
       const d = node("div", { class: "stat" });

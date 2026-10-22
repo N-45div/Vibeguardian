@@ -31,7 +31,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import quote
 
-import google.auth
 import requests
 from flask import Flask, abort, jsonify, request, send_from_directory
 from google.auth.transport.requests import AuthorizedSession, Request
@@ -39,6 +38,7 @@ from google.oauth2 import id_token
 
 from vibeguardian.drill import Place, local_round, run_drill, sweep
 from vibeguardian.gcp.apikeys import ApiKeys
+from vibeguardian.gcp.client import session as gcp_session
 from vibeguardian.secret import fingerprint
 from vibeguardian.vantage import parse_vantages
 
@@ -61,8 +61,8 @@ _state: dict = {"current": None, "record": None, "persisted": 0.0, "stats": None
 
 
 def _session() -> AuthorizedSession:
-    credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
-    return AuthorizedSession(credentials)
+    """Signed requests with retries on dropped connections (a DELETE is retried; a POST that reached Google is not)."""
+    return gcp_session()
 
 
 # --- storage: one JSON object per drill, in a private bucket -------------------------------------
@@ -187,14 +187,18 @@ def stats():
             records = [r for r in pool.map(_get, names) if r]
         finished = [r for r in records if (r.get("verdict") or {}).get("state") in ("proven_dead", "not_proven")]
         revived = [r for r in finished if (r["verdict"].get("revivals") or [])]
+        gemini = [r for r in finished if any("ask" in e.get("how", "") for e in r["verdict"].get("revivals") or [])]
         events = [e for r in finished for e in r["verdict"].get("revivals") or []]
+        # Times count only from drills that time each answer by when its call left (t_basis "sent").
+        timed = [e for r in finished if r.get("t_basis") == "sent" for e in r["verdict"].get("revivals") or []]
         proven = sorted(r["verdict"]["seconds"] for r in finished if r["verdict"]["state"] == "proven_dead")
         by_place: dict = {}
         for e in events:
             by_place[e["label"]] = by_place.get(e["label"], 0) + 1
         _state["stats"] = {
-            "drills": len(finished), "with_revival": len(revived), "revival_events": len(events),
-            "latest_revival_s": max((e["t"] for e in events), default=None), "revivals_by_place": by_place,
+            "drills": len(finished), "with_revival": len(revived), "gemini_answered": len(gemini),
+            "revival_events": len(events),
+            "latest_revival_s": max((e["t"] for e in timed), default=None), "revivals_by_place": by_place,
             "median_proven_s": proven[len(proven) // 2] if proven else None,
             "recent": [{"id": r["id"], "started_at": r.get("started_at"), "state": (r.get("verdict") or {}).get("state"),
                         "seconds": (r.get("verdict") or {}).get("seconds"),

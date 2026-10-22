@@ -94,7 +94,7 @@ def run_drill(
 ) -> dict[str, Any]:
     record: dict[str, Any] = {
         "id": drill_id, "status": "running", "started_at": round(clock(), 3), "model": GEMINI_MODEL,
-        "prompt": GEMINI_PROMPT, "stable": stable, "fingerprint": None, "key": None, "steps": [],
+        "prompt": GEMINI_PROMPT, "stable": stable, "t_basis": "sent", "fingerprint": None, "key": None, "steps": [],
         "deleted_at": None, "places": {p.name: {"label": p.label, "rounds": [], "streak": 0, "state": "waiting",
                                                 "proven_at": None, "answered_after_delete": []} for p in places},
         "verdict": None,
@@ -150,10 +150,12 @@ def run_drill(
                 break
             results = parallel([lambda p=p: _safe_round(p, secret) for p in proving])
             now = clock()
-            t = round(now - record["deleted_at"], 1)
             for p, result in zip(proving, results):
                 place = record["places"][p.name]
                 verdict = combine(result)
+                # A round is timed by when its calls left, not when the slower one came back:
+                # Gemini can take 20 s to answer.
+                t = _since(_sent(result, ("list", "ask")), now, record["deleted_at"])
                 place["rounds"].append(_round_entry(t, verdict, result))
                 if verdict == Verdict.DEAD.value:
                     place["streak"] += 1
@@ -164,10 +166,11 @@ def run_drill(
                 elif verdict == Verdict.ALIVE.value:
                     place["streak"] = 0
                     last_answer[p.name] = now
+                    worked = [part for part in ("ask", "list")
+                              if (result.get(part) or {}).get("verdict") == Verdict.ALIVE.value]
                     place["answered_after_delete"].append({
-                        "t": t, "answer": (result.get("ask") or {}).get("answer"),
-                        "how": "+".join(part for part in ("ask", "list")
-                                        if (result.get(part) or {}).get("verdict") == Verdict.ALIVE.value)})
+                        "t": _since(_sent(result, worked), now, record["deleted_at"]),
+                        "answer": (result.get("ask") or {}).get("answer"), "how": "+".join(worked)})
                 elif now - last_answer[p.name] > unreachable_after:
                     place["state"] = "unreachable"
             save(record)
@@ -196,6 +199,18 @@ def run_drill(
             except Exception:  # noqa: BLE001 - the sweeper removes it on the next drill
                 pass
         secret = None  # noqa: F841 - drop the only reference to the value
+
+
+def _sent(result: dict[str, Any], parts: Any) -> float | None:
+    """When the earliest of these calls left, from each call's own start time."""
+    starts = [(result.get(part) or {}).get("at") for part in parts]
+    starts = [s for s in starts if isinstance(s, (int, float))]
+    return min(starts) if starts else None
+
+
+def _since(sent: float | None, fallback: float, deleted_at: float) -> float:
+    """Seconds after deletion; a call cannot leave before the delete returned, so never below 0."""
+    return round(max(0.0, (sent if sent is not None else fallback) - deleted_at), 1)
 
 
 def _safe_round(place: Place, key: str) -> dict[str, Any]:

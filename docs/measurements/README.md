@@ -27,6 +27,8 @@ What this shows so far:
   dead.
 - We did not reproduce the 8 to 23 minute windows reported in May 2026 from
   other regions. Two runs from one place are not enough to say either way.
+  The live drills (below) repeat this 40 times from five places: the latest
+  answer there was 92.8 s after deletion.
 
 ## Retiring a live key with no downtime
 
@@ -393,6 +395,69 @@ Google's per-key counts: treat those counts as a lower bound. Raw:
 [outsider](raw/2026-10-21-ci-drill15-outsider.log),
 [load](raw/2026-10-21-ci-drill15-load.log),
 [timings](raw/2026-10-21-ci-drill15-timings.json).
+
+## Live drills: how often a deleted key still answers
+
+How: the public live drill (`demo/live/`, engine `vibeguardian/drill.py`),
+the Cloud Run service `vg-live` in us-central1. Each drill:
+
+1. creates a throwaway key restricted to the Gemini API, named `vg-live-<id>`;
+2. waits until Gemini 4 Argon answers with it (`generateContent`, "Reply with
+   the single word ALIVE.", 5 output tokens), then uses it 5 more times;
+3. deletes it;
+4. every 4 s asks Google from five places at once: Iowa (the service itself)
+   and the four vantages in Belgium, Tokyo, Sydney and São Paulo. Each round
+   makes two calls in parallel, `models.list` and the same Gemini prompt. A
+   round is alive if either call is answered, dead if both are refused, and
+   unknown otherwise; unknown neither counts toward a streak nor breaks one;
+5. calls the key proven dead when every place that answers has seen 12 dead
+   rounds in a row. A place silent for 60 s is left out and named; after
+   360 s the verdict is "not proven".
+
+Times are seconds after deletion, taken from when each call was sent, so a
+slow reply does not stretch them.
+
+The study: 20 drills back to back, 2026-10-22 18:56 to 19:39 UTC, 1,348
+rounds (2,696 calls). The new key first answered 1.9 to 27.2 s after it was
+created.
+
+| | Result |
+|---|---|
+| Proven dead | **20 of 20**, median 72.4 s after deletion, slowest 145.1 s |
+| A call sent after deletion still got an answer | **16 of 20 drills**, 50 answers in all |
+| Gemini 4 Argon generated a reply for a deleted key | 14 of 20 drills |
+| A place refused the key, then answered it again | 9 of 20 drills |
+| An answer came after another place had already seen 12 refusals in a row | 4 of 20 drills |
+| Answers to calls sent 5 s or more after deletion | 21, in 11 drills |
+| Latest answered call | **92.8 s** after deletion: Iowa, Gemini replied "ALIVE" (drill `jv2ije2paj`) |
+| Drills where each place answered a deleted key | Tokyo 10, Belgium 9, Sydney 7, Iowa 6, São Paulo 1 |
+| Places left out for not answering | none |
+
+Other late answers: Belgium listed models 78.7 s after deletion (drill
+`dpt4he6h8i`), Sydney 75.7 s (`pxz5hxpc6e`), and Tokyo's Gemini replied
+"ALIVE" at 63.3 s (`4mnz2h7amb`).
+
+No key outlived its proof: every answer came before the last place's 12th
+refusal in a row. What the drills show is the point of asking from five
+places: in 4 of 20, a prover that stopped when its own place had 12
+refusals in a row would have called the key dead while it was still
+answering elsewhere, and in 9 a place that had refused the key answered it
+again. Most answers (29 of 50) were to calls sent within 5 s of deletion.
+Every drill can be replayed round by round at
+`https://vg-live-895320568859.us-central1.run.app/d/<id>`.
+
+A first run of 21 drills (17:47 to 18:49 UTC, same day) timed each round by
+when it ended rather than when its calls were sent, so its times are not
+quoted. Its counts agree: 20 proven dead out of 20 that finished, 12 with an
+answer after deletion, 11 with a Gemini reply. The 21st (`ctni6vqe7t`)
+stopped on a dropped connection while deleting its key. Google did delete it
+(its delete time is 18:41:12 UTC), but the reply never arrived, so the drill
+had no deletion time to prove from. Deletes now go through the retrying
+session.
+
+Raw: [study](raw/2026-10-22-live-drills-study.jsonl),
+[first run](raw/2026-10-22-live-drills-first-run.jsonl), one drill record
+per line. `demo/live/summarize.py` exports and counts them.
 
 ## Retiring a leaked service-account key
 

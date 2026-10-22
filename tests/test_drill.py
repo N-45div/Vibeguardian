@@ -163,3 +163,24 @@ def test_sweep_skips_keys_with_no_readable_time(bad):
 
     keys = K()
     assert sweep(keys, "p", clock=lambda: 2e9) == [] and keys.deleted == []
+
+
+def test_rounds_and_revivals_are_timed_by_when_the_calls_left_not_when_they_came_back():
+    clock = Clock()
+    calls = {"n": 0}
+
+    def slow(key):
+        calls["n"] += 1
+        sent = clock.t  # the calls leave now ...
+        clock.t += 15.0  # ... and Gemini takes 15 s to answer
+        if calls["n"] == 1:
+            return {"list": {"verdict": "dead", "at": sent}, "ask": {"verdict": "alive", "at": sent + 0.2, "answer": "ALIVE"}}
+        return {"list": {"verdict": "dead", "at": sent}, "ask": {"verdict": "dead", "at": sent}}
+
+    record = run_drill("d2", project="p", keys=FakeKeys(), places=[Place("europe-west1", "Belgium", slow)],
+                       save=lambda r: None, ask=lambda key: answer(Verdict.ALIVE, "ALIVE"), clock=clock,
+                       sleep=clock.sleep, parallel=lambda c: [f() for f in c], stable=2, interval=4.0)
+    rounds = record["places"]["europe-west1"]["rounds"]
+    assert rounds[0]["t"] == 0.0  # sent right after the delete, though it came back 15 s later
+    assert record["places"]["europe-west1"]["answered_after_delete"][0]["t"] == 0.2  # the Gemini call itself
+    assert rounds[1]["t"] == 19.0 and record["t_basis"] == "sent"

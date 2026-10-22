@@ -25,6 +25,7 @@ link and is counted on the page.
 | Requests served during a retirement | 315 of 315 OK (drill 5) |
 | Proven dead from five vantage points | 191 s after the push, 60 of 60 rejections (drill 10) |
 | A deleted key that answered again | Europe returned **HTTP 200 for a deleted key 111 s after deletion**, after the CI runner alone had seen 12 rejections in a row (drill 11) |
+| 20 live drills in a row | a call sent after deletion still got an answer in **16 of 20**, Gemini 4 Argon generated a reply in 14, the latest **92.8 s** after deletion; all 20 then proven dead from five places |
 | A stolen service-account token after its key was disabled | kept working for **59.7 min**; disabling the account stopped it in 11.7 s |
 | Google's new `AQ.` authorization keys | detected, retired, and proven dead 60 of 60 (drill 14) |
 
@@ -35,6 +36,12 @@ ends cache key checks, so a deleted key can keep working for a while, and
 how long differs by region. VibeGuardian treats Google's own answer as the
 only proof: an incident closes when the old key is rejected repeatedly from
 every vantage point that answers, not when a script says "deleted".
+
+In 20 live drills in a row, a place that had refused the deleted key
+answered it again in 9, and in 4 an answer came after another place had
+already seen 12 refusals in a row. A check that stopped at the first
+refusal, or asked from one place, would have called those keys dead while
+they still worked.
 
 ## What happens when a key leaks
 
@@ -137,7 +144,8 @@ Each of these is a real run, with its raw records in
 
 - **A live drill, now.** [Run one](https://vg-live-895320568859.us-central1.run.app):
   about three minutes on a fresh key, with a permanent link to its proof.
-  The service is `demo/live/`; its engine is `vibeguardian/drill.py`.
+  The service is `demo/live/`; its engine is `vibeguardian/drill.py`. A
+  study of 20 drills in a row is on the measurements page.
 - **The run in the demo video.** Drill 15: leaked key deleted 77.9 s after
   the push, proven dead from five places at 193.9 s, 542 of 542 app requests
   OK, and an outsider's calls flagged from Google's counts.
