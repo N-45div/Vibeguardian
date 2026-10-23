@@ -19,6 +19,10 @@ asks again from Iowa, Belgium, Tokyo, Sydney and São Paulo until every place re
 12 rounds in a row, with Gemini's own answer as the judge. Every drill keeps its own
 link and is counted on the page.
 
+Two models, two jobs. The GitLab Duo agents write the incident and open the fix, and
+never see a key. Gemini 4 Argon is what a leaked key unlocks: the demo app answers with
+it, and the live drill uses its reply to judge whether a deleted key still works.
+
 | What | Measured |
 |---|---|
 | Leaked Gemini key retired, after the push | 76 s (drill 10), with the app healthy on the replacement throughout |
